@@ -41,5 +41,8 @@
   "files": [
     "**/*.js",
     "**/*.ts"
-  ]
+  ],
+  "dependencies": {
+    "@croct-tech/time": "^0.1.1"
+  }
 }
