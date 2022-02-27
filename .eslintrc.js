@@ -5,6 +5,6 @@ module.exports = {
     extends: ['plugin:@croct/typescript'],
     plugins: ['@croct'],
     parserOptions: {
-        project: ['**/tsconfig.json'],
+        project: ['./tsconfig.json'],
     },
 };

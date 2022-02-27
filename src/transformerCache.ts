@@ -1,5 +1,5 @@
-import hash from 'object-hash';
 import {JsonValue} from '@croct-tech/json';
+import * as hash from 'object-hash';
 import {CacheSetOptions, DataCache, MaybeExpired} from './dataCache';
 
 export type Transformer<D, S> = (value: D) => S;
