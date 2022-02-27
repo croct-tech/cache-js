@@ -1,6 +1,5 @@
-import hash from 'node-object-hash';
-import {identity} from 'underscore';
-import {JsonValue} from '../jsonTypes';
+import hash from 'object-hash';
+import {JsonValue} from '@croct-tech/json';
 import {CacheSetOptions, DataCache, MaybeExpired} from './dataCache';
 
 export type Transformer<D, S> = (value: D) => S;
@@ -40,8 +39,8 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
         return new TransformerCache({
             cache: cache,
             keySerializer: keyTransformer,
-            valueInputTransformer: identity,
-            valueOutputTransformer: identity,
+            valueInputTransformer: value => value,
+            valueOutputTransformer: value => value,
         });
     }
 
@@ -52,7 +51,7 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
     ): TransformerCache<K, V, K, IV> {
         return new TransformerCache({
             cache: cache,
-            keySerializer: identity,
+            keySerializer: key => key,
             valueInputTransformer: inputTransformer,
             valueOutputTransformer: outputTransformer,
         });
@@ -96,15 +95,14 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
     }
 
     public static createHashSerializer(
-        alg?: 'md5' | 'sha1' | 'sha256' | 'sha3-256',
+        alg?: hash.Options['algorithm'],
     ): Transformer<any, string> {
-        const hasher = hash({
-            alg: alg,
-            sort: true,
-            enc: 'hex',
-        });
+        const options: hash.Options = {
+            encoding: 'base64',
+            algorithm: alg,
+        };
 
-        return (value: any): string => hasher.hash(value);
+        return (value: any): string => hash(value, options);
     }
 
     // Type-safe wrapper around JSON.stringify
