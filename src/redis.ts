@@ -13,6 +13,9 @@ type Configuration = {
     staleWindow: number,
 };
 
+/**
+ * A cache that stores data in Redis.
+ */
 export class RedisCache implements DataCache<string, string> {
     private readonly redis: Redis.Redis;
 

@@ -1,5 +1,8 @@
 import {CacheSetOptions, DataCache, MaybeExpired} from './dataCache';
 
+/**
+ * A cache that prefixes keys with a string.
+ */
 export class PrefixedCached<V> implements DataCache<string, V> {
     private readonly inner: DataCache<string, V>;
 

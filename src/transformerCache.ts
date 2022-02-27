@@ -1,4 +1,4 @@
-import {JsonValue} from '@croct-tech/json';
+import {JsonCompatible, JsonValue} from '@croct-tech/json';
 import * as hash from 'object-hash';
 import {CacheSetOptions, DataCache, MaybeExpired} from './dataCache';
 
@@ -11,6 +11,9 @@ type Configuration<K, V, IK, IV> = {
     valueOutputTransformer: Transformer<IV, V>,
 };
 
+/**
+ * A cache wrapper that can transform the key and value before storing them in the cache.
+ */
 export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
     private readonly cache: DataCache<IK, IV>;
 
@@ -106,7 +109,7 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
     }
 
     // Type-safe wrapper around JSON.stringify
-    public static jsonSerializer<T extends JsonValue>(): Transformer<T, string> {
+    public static jsonSerializer<T extends JsonCompatible>(): Transformer<T, string> {
         return JSON.stringify;
     }
 

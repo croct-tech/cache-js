@@ -6,6 +6,9 @@ type CacheEntry<T> = {
     expiresAt: Instant,
 };
 
+/**
+ * In-memory cache implementation backed by a native `Map`.
+ */
 export class InMemoryCache<T = any> implements DataCache<string, T> {
     private readonly defaultTtl: number;
 
