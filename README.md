@@ -3,12 +3,12 @@
         <img src="https://cdn.croct.io/brand/logo/repo-icon-green.svg" alt="Croct" height="80"/>
     </a>
     <br />
-    <strong>TypeScript Project Title</strong>
+    <strong>Caching library</strong>
     <br />
-    A brief description about the project.
+    An arbitrary data caching library.
 </p>
 <p align="center">
-    <img alt="Build" src="https://img.shields.io/badge/build-passing-green" />
+    <img alt="Build" src="https://github.com/croct-tech/cache-js/actions/workflows/validate-branch.yaml/badge.svg" />
     <a href="https://codeclimate.com/repos/621adab1f58476018c0002f1/test_coverage"><img src="https://api.codeclimate.com/v1/badges/44752b2e8f1f990799da/test_coverage" /></a>
     <a href="https://codeclimate.com/repos/621adab1f58476018c0002f1/maintainability"><img src="https://api.codeclimate.com/v1/badges/44752b2e8f1f990799da/maintainability" /></a>
     <br />
