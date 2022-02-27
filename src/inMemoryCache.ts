@@ -18,10 +18,6 @@ export class InMemoryCache<T = any> implements DataCache<string, T> {
 
     private cache = new Map<string, CacheEntry<T>>();
 
-    public getCount(): number {
-        return this.cache.size;
-    }
-
     public get(key: string): Promise<T | null> {
         const entry = this.cache.get(key);
 
