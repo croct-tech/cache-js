@@ -3,57 +3,39 @@
         <img src="https://cdn.croct.io/brand/logo/repo-icon-green.svg" alt="Croct" height="80"/>
     </a>
     <br />
-    <strong>TypeScript Project Title</strong>
+    <strong>Caching library</strong>
     <br />
-    A brief description about the project.
+    An arbitrary data caching library.
 </p>
 <p align="center">
-    <img alt="Build" src="https://img.shields.io/badge/build-passing-green" />
-    <img alt="Coverage" src="https://img.shields.io/badge/coverage-100%25-green" />
-    <img alt="Maintainability" src="https://img.shields.io/badge/maintainability-100-green" />
+    <img alt="Build" src="https://github.com/croct-tech/cache-js/actions/workflows/validate-branch.yaml/badge.svg" />
+    <a href="https://codeclimate.com/repos/621adab1f58476018c0002f1/test_coverage"><img src="https://api.codeclimate.com/v1/badges/44752b2e8f1f990799da/test_coverage" /></a>
+    <a href="https://codeclimate.com/repos/621adab1f58476018c0002f1/maintainability"><img src="https://api.codeclimate.com/v1/badges/44752b2e8f1f990799da/maintainability" /></a>
     <br />
     <br />
-    <a href="https://github.com/croct-tech/repository-template-typescript/releases">📦Releases</a>
+    <a href="https://github.com/croct-tech/cache-js/releases">📦Releases</a>
         ·
-        <a href="https://github.com/croct-tech/repository-template-typescript/issues/new?labels=bug&template=bug-report.md">🐞Report Bug</a>
+        <a href="https://github.com/croct-tech/cache-js/issues/new?labels=bug&template=bug-report.md">🐞Report Bug</a>
         ·
-        <a href="https://github.com/croct-tech/repository-template-typescript/issues/new?labels=enhancement&template=feature-request.md">✨Request Feature</a>
+        <a href="https://github.com/croct-tech/cache-js/issues/new?labels=enhancement&template=feature-request.md">✨Request Feature</a>
 </p>
 
-# Instructions
-Follow the steps below to create a new repository:
-
-1. Customize the repository
-   1. Click on the _Use this template_ button at the top of this page
-   2. Clone the repository locally 
-   3. Update the `README.md` and `package.json` with the new package information
-2. Setup Code Climate
-   1. Add the project to [Croct's code climate organization](https://codeclimate.com/accounts/5e714648faaa9c00fb000081/dashboard)
-   2. Go to **Repo Settings > Test coverage** and copy the "_TEST REPORTER ID_"
-   3. Go to **Repo Settings > Badges** and copy the maintainability and coverage badges to the `README.md` 
-   4. On the Github repository page, go to **Settings > Secrets** and add a secret with name `CC_TEST_REPORTER_ID` and the ID from the previous step as value.
-   
 ## Installation
 Use the package manage [NPM](https://www.npmjs.com) to install the package:
 
 ```sh
-npm install @croct/project-ts
+npm install @croct-tech/cache
 ```
 
-## Basic usage
+## Usage
 
-```typescript
-import {Example} from '@croct/project-ts';
-
-const example = new Example();
-example.displayBasicUsage();
-```
+Usage of the docs can be found at the [docs](/docs/README.md).
 
 ## Contributing
 Contributions to the package are always welcome! 
 
-- Report any bugs or issues on the [issue tracker](https://github.com/croct-tech/project-ts/issues).
-- For major changes, please [open an issue](https://github.com/croct-tech/project-ts/issues) first to discuss what you would like to change.
+- Report any bugs or issues on the [issue tracker](https://github.com/croct-tech/cache-js/issues).
+- For major changes, please [open an issue](https://github.com/croct-tech/cache-js/issues) first to discuss what you would like to change.
 - Please make sure to update tests as appropriate.
 
 ## Testing
@@ -84,16 +66,10 @@ Before building the project, the dependencies must be installed:
 npm install
 ```
 
-Then, to build the CommonJS module:
+The following command builds the library:
 
 ```sh
-npm run rollup
-```
-
-The following command bundles a minified IIFE module for browsers:
-
-```
-npm run rollup-min
+npm run build
 ```
 
 ## License
