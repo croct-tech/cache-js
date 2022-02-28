@@ -30,7 +30,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@croct-tech/json": "^0.1",
+    "@croct-tech/json": "^0.2",
     "@croct-tech/time": "^0.1",
     "object-hash": "^3.0.0"
   },
