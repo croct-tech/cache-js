@@ -1,11 +1,11 @@
 import {JsonCompatible, JsonValue} from '@croct-tech/json';
 import * as hash from 'object-hash';
-import {CacheSetOptions, DataCache, MaybeExpired} from './dataCache';
+import {OverridableCacheProvider} from './cacheProvider';
 
 export type Transformer<D, S> = (value: D) => S;
 
 type Configuration<K, V, IK, IV> = {
-    cache: DataCache<IK, IV>,
+    cache: OverridableCacheProvider<IK, IV>,
     keySerializer: Transformer<K, IK>,
     valueInputTransformer: Transformer<V, IV>,
     valueOutputTransformer: Transformer<IV, V>,
@@ -14,8 +14,8 @@ type Configuration<K, V, IK, IV> = {
 /**
  * A cache wrapper that can transform the key and value before storing them in the cache.
  */
-export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
-    private readonly cache: DataCache<IK, IV>;
+export class TransformerCache<K, V, IK = K, IV = V> implements OverridableCacheProvider<K, V> {
+    private readonly cache: OverridableCacheProvider<IK, IV>;
 
     private readonly keyTransformer: Transformer<K, IK>;
 
@@ -36,7 +36,7 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
     }
 
     public static transformKey<K, IK, V>(
-        cache: DataCache<IK, V>,
+        cache: OverridableCacheProvider<IK, V>,
         keyTransformer: Transformer<K, IK>,
     ): TransformerCache<K, V, IK, V> {
         return new TransformerCache({
@@ -48,7 +48,7 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
     }
 
     public static transformValue<K, V, IV>(
-        cache: DataCache<K, IV>,
+        cache: OverridableCacheProvider<K, IV>,
         inputTransformer: Transformer<V, IV>,
         outputTransformer: Transformer<IV, V>,
     ): TransformerCache<K, V, K, IV> {
@@ -60,36 +60,17 @@ export class TransformerCache<K, V, IK = K, IV = V> implements DataCache<K, V> {
         });
     }
 
-    public get(key: K): Promise<V | null> {
-        return this.cache.get(this.keyTransformer(key))
-            .then(
-                value => (
-                    value != null
-                        ? this.valueOutputTransformer(value)
-                        : null
-                ),
-            );
+    public get(key: K, fallback: (key: K) => Promise<V>): Promise<V> {
+        return this.cache.get(
+            this.keyTransformer(key),
+            () => fallback(key).then(this.valueInputTransformer),
+        ).then(this.valueOutputTransformer);
     }
 
-    public getStale(key: K): Promise<MaybeExpired<V> | null> {
-        return this.cache.getStale(this.keyTransformer(key))
-            .then(
-                value => (
-                    value != null
-                        ? {
-                            ...value,
-                            value: this.valueOutputTransformer(value.value),
-                        }
-                        : null
-                ),
-            );
-    }
-
-    public set(key: K, value: V, options?: CacheSetOptions): Promise<void> {
+    public set(key: K, value: V): Promise<void> {
         return this.cache.set(
             this.keyTransformer(key),
             this.valueInputTransformer(value),
-            options,
         );
     }
 
