@@ -2,59 +2,59 @@ import {JsonCompatible, JsonValue} from '@croct-tech/json';
 import * as hash from 'object-hash';
 import {OverridableCacheProvider} from './cacheProvider';
 
-export type Transformer<D, S> = (value: D) => S;
+export type Adapted<D, S> = (value: D) => S;
 
 type Configuration<K, V, IK, IV> = {
     cache: OverridableCacheProvider<IK, IV>,
-    keySerializer: Transformer<K, IK>,
-    valueInputTransformer: Transformer<V, IV>,
-    valueOutputTransformer: Transformer<IV, V>,
+    keyTransformer: Adapted<K, IK>,
+    valueInputTransformer: Adapted<V, IV>,
+    valueOutputTransformer: Adapted<IV, V>,
 };
 
 /**
  * A cache wrapper that can transform the key and value before storing them in the cache.
  */
-export class TransformerCache<K, V, IK = K, IV = V> implements OverridableCacheProvider<K, V> {
+export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvider<K, V> {
     private readonly cache: OverridableCacheProvider<IK, IV>;
 
-    private readonly keyTransformer: Transformer<K, IK>;
+    private readonly keyTransformer: Adapted<K, IK>;
 
-    private readonly valueInputTransformer: Transformer<V, IV>;
+    private readonly valueInputTransformer: Adapted<V, IV>;
 
-    private readonly valueOutputTransformer: Transformer<IV, V>;
+    private readonly valueOutputTransformer: Adapted<IV, V>;
 
     public constructor({
         cache,
-        keySerializer,
+        keyTransformer,
         valueInputTransformer,
         valueOutputTransformer,
     }: Configuration<K, V, IK, IV>) {
         this.cache = cache;
-        this.keyTransformer = keySerializer;
+        this.keyTransformer = keyTransformer;
         this.valueInputTransformer = valueInputTransformer;
         this.valueOutputTransformer = valueOutputTransformer;
     }
 
-    public static transformKey<K, IK, V>(
+    public static transformKeys<K, IK, V>(
         cache: OverridableCacheProvider<IK, V>,
-        keyTransformer: Transformer<K, IK>,
-    ): TransformerCache<K, V, IK, V> {
-        return new TransformerCache({
+        keyTransformer: Adapted<K, IK>,
+    ): AdaptedCache<K, V, IK, V> {
+        return new AdaptedCache({
             cache: cache,
-            keySerializer: keyTransformer,
+            keyTransformer: keyTransformer,
             valueInputTransformer: value => value,
             valueOutputTransformer: value => value,
         });
     }
 
-    public static transformValue<K, V, IV>(
+    public static transformValues<K, V, IV>(
         cache: OverridableCacheProvider<K, IV>,
-        inputTransformer: Transformer<V, IV>,
-        outputTransformer: Transformer<IV, V>,
-    ): TransformerCache<K, V, K, IV> {
-        return new TransformerCache({
+        inputTransformer: Adapted<V, IV>,
+        outputTransformer: Adapted<IV, V>,
+    ): AdaptedCache<K, V, K, IV> {
+        return new AdaptedCache({
             cache: cache,
-            keySerializer: key => key,
+            keyTransformer: key => key,
             valueInputTransformer: inputTransformer,
             valueOutputTransformer: outputTransformer,
         });
@@ -80,7 +80,7 @@ export class TransformerCache<K, V, IK = K, IV = V> implements OverridableCacheP
 
     public static createHashSerializer(
         alg?: hash.Options['algorithm'],
-    ): Transformer<any, string> {
+    ): Adapted<any, string> {
         const options: hash.Options = {
             encoding: 'base64',
             algorithm: alg,
@@ -90,12 +90,12 @@ export class TransformerCache<K, V, IK = K, IV = V> implements OverridableCacheP
     }
 
     // Type-safe wrapper around JSON.stringify
-    public static jsonSerializer<T extends JsonCompatible>(): Transformer<T, string> {
+    public static jsonSerializer<T extends JsonCompatible>(): Adapted<T, string> {
         return JSON.stringify;
     }
 
     // Type-safe wrapper around JSON.parse
-    public static jsonDeserializer<T extends JsonValue>(): Transformer<string, T> {
+    public static jsonDeserializer<T extends JsonValue>(): Adapted<string, T> {
         return JSON.parse;
     }
 }

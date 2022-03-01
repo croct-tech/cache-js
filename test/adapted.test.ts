@@ -1,46 +1,27 @@
-import {Instant} from '@croct-tech/time';
-import {CacheSetOptions, DataCache, TransformerCache} from '../src';
+import {AdaptedCache, OverridableCacheProvider} from '../src';
 
-describe('A cache wrapper that can transform keys and values', () => {
-    const mockCache: jest.MockedObject<DataCache<string, string>> = {
+describe('A cache adapter that can transform keys and values', () => {
+    const mockCache: jest.MockedObject<OverridableCacheProvider<string, string>> = {
         get: jest.fn(),
-        getStale: jest.fn(),
         set: jest.fn(),
         delete: jest.fn(),
     };
 
     it('should apply the key transformer when getting a value', async () => {
+        mockCache.get.mockImplementation((key, fallback) => fallback(key));
+
         const transformer = jest.fn().mockReturnValueOnce('transformed');
 
-        mockCache.get.mockResolvedValueOnce('value');
+        const fallback = jest.fn().mockResolvedValue('value');
 
-        const cache = TransformerCache.transformKey(mockCache, transformer);
+        const cache = AdaptedCache.transformKeys(mockCache, transformer);
 
-        const result = await cache.get('key');
+        const result = await cache.get('key', fallback);
 
         expect(transformer).toHaveBeenCalledWith('key');
-        expect(mockCache.get).toHaveBeenCalledWith('transformed');
+        expect(mockCache.get).toHaveBeenCalledWith('transformed', expect.any(Function));
+        expect(fallback).toHaveBeenCalledWith('key');
         expect(result).toBe('value');
-    });
-
-    it('should apply the key transformer when getting a possibly stale value', async () => {
-        const transformer = jest.fn().mockReturnValueOnce('transformed');
-
-        mockCache.getStale.mockResolvedValueOnce({
-            value: 'value',
-            expirationTime: null,
-        });
-
-        const cache = TransformerCache.transformKey(mockCache, transformer);
-
-        const result = await cache.getStale('key');
-
-        expect(transformer).toHaveBeenCalledWith('key');
-        expect(mockCache.getStale).toHaveBeenCalledWith('transformed');
-        expect(result).toStrictEqual({
-            value: 'value',
-            expirationTime: null,
-        });
     });
 
     it('should apply the key transformer when setting a value', async () => {
@@ -48,17 +29,12 @@ describe('A cache wrapper that can transform keys and values', () => {
 
         mockCache.set.mockResolvedValueOnce();
 
-        const cache = TransformerCache.transformKey(mockCache, transformer);
+        const cache = AdaptedCache.transformKeys(mockCache, transformer);
 
-        const options: CacheSetOptions = {
-            ttl: 1000,
-            staleWindow: 2000,
-        };
-
-        await cache.set('key', 'value', options);
+        await cache.set('key', 'value');
 
         expect(transformer).toHaveBeenCalledWith('key');
-        expect(mockCache.set).toHaveBeenCalledWith('transformed', 'value', options);
+        expect(mockCache.set).toHaveBeenCalledWith('transformed', 'value');
     });
 
     it('should apply the key transformer when deleting a value', async () => {
@@ -66,7 +42,7 @@ describe('A cache wrapper that can transform keys and values', () => {
 
         mockCache.delete.mockResolvedValueOnce();
 
-        const cache = TransformerCache.transformKey(mockCache, transformer);
+        const cache = AdaptedCache.transformKeys(mockCache, transformer);
 
         await cache.delete('key');
 
@@ -75,49 +51,48 @@ describe('A cache wrapper that can transform keys and values', () => {
     });
 
     it('should apply the value output transformer when getting a value', async () => {
-        const inputTransformer = jest.fn();
-        const outputTransformer = jest.fn().mockReturnValueOnce('transformed');
-
         mockCache.get.mockResolvedValueOnce('value');
 
-        const cache = TransformerCache.transformValue(
-            mockCache,
-            inputTransformer,
-            outputTransformer,
-        );
-
-        const result = await cache.get('key');
-
-        expect(inputTransformer).not.toHaveBeenCalled();
-        expect(outputTransformer).toHaveBeenCalledWith('value');
-        expect(mockCache.get).toHaveBeenCalledWith('key');
-        expect(result).toBe('transformed');
-    });
-
-    it('should apply the value output transformer when getting a possibly stale value', async () => {
         const inputTransformer = jest.fn();
         const outputTransformer = jest.fn().mockReturnValueOnce('transformed');
 
-        mockCache.getStale.mockResolvedValueOnce({
-            value: 'value',
-            expirationTime: Instant.fromEpochMillis(1234),
-        });
+        const fallback = jest.fn();
 
-        const cache = TransformerCache.transformValue(
+        const cache = AdaptedCache.transformValues(
             mockCache,
             inputTransformer,
             outputTransformer,
         );
 
-        const result = await cache.getStale('key');
+        const result = await cache.get('key', fallback);
 
         expect(inputTransformer).not.toHaveBeenCalled();
         expect(outputTransformer).toHaveBeenCalledWith('value');
-        expect(mockCache.getStale).toHaveBeenCalledWith('key');
-        expect(result).toStrictEqual({
-            value: 'transformed',
-            expirationTime: Instant.fromEpochMillis(1234),
-        });
+        expect(result).toBe('transformed');
+
+        expect(fallback).not.toHaveBeenCalled();
+    });
+
+    it('should apply the value input transformer on fallback value', async () => {
+        mockCache.get.mockImplementation((key, fallback) => fallback(key));
+
+        const inputTransformer = jest.fn().mockReturnValueOnce('transformedInput');
+        const outputTransformer = jest.fn().mockReturnValueOnce('transformedOutput');
+
+        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+
+        const cache = AdaptedCache.transformValues(
+            mockCache,
+            inputTransformer,
+            outputTransformer,
+        );
+
+        const result = await cache.get('key', fallback);
+
+        expect(inputTransformer).toHaveBeenCalledWith('fallbackValue');
+        expect(outputTransformer).toHaveBeenCalledWith('transformedInput');
+        expect(fallback).toHaveBeenCalledWith('key');
+        expect(result).toBe('transformedOutput');
     });
 
     it('should apply the value input transformer when setting a value', async () => {
@@ -126,26 +101,21 @@ describe('A cache wrapper that can transform keys and values', () => {
 
         mockCache.set.mockResolvedValueOnce();
 
-        const cache = TransformerCache.transformValue(
+        const cache = AdaptedCache.transformValues(
             mockCache,
             inputTransformer,
             outputTransformer,
         );
 
-        const options: CacheSetOptions = {
-            ttl: 1000,
-            staleWindow: 2000,
-        };
-
-        await cache.set('key', 'value', options);
+        await cache.set('key', 'value');
 
         expect(inputTransformer).toHaveBeenCalledWith('value');
         expect(outputTransformer).not.toHaveBeenCalled();
-        expect(mockCache.set).toHaveBeenCalledWith('key', 'transformed', options);
+        expect(mockCache.set).toHaveBeenCalledWith('key', 'transformed');
     });
 
     it('should transform a value into a hash', () => {
-        const transformer = TransformerCache.createHashSerializer('md5');
+        const transformer = AdaptedCache.createHashSerializer('md5');
 
         const value = {
             some: {
@@ -172,7 +142,7 @@ describe('A cache wrapper that can transform keys and values', () => {
     });
 
     it('should transform a value into its JSON representation', () => {
-        const transformer = TransformerCache.jsonSerializer();
+        const transformer = AdaptedCache.jsonSerializer();
 
         const value = {
             foo: 'bar',
@@ -185,7 +155,7 @@ describe('A cache wrapper that can transform keys and values', () => {
     });
 
     it('should transform a JSON representation back into its original form', () => {
-        const transformer = TransformerCache.jsonDeserializer();
+        const transformer = AdaptedCache.jsonDeserializer();
 
         const value = {
             foo: 'bar',
