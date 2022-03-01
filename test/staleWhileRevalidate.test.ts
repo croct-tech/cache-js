@@ -46,24 +46,23 @@ describe('A cache provider wrapper that automatically caches the fallback value 
         };
 
         mockCache.get.mockResolvedValue(cachedEntry);
-        mockCache.set.mockResolvedValue();
+
+        let resolveSet: () => void = jest.fn();
+        const setPromise = new Promise<void>(resolve => { resolveSet = resolve; });
+
+        mockCache.set.mockImplementation(() => {
+            resolveSet();
+
+            return setPromise;
+        });
 
         jest.spyOn(Instant, 'now').mockReturnValue(now);
 
-        let thenCallback: (value: string) => any = jest.fn();
+        let resolveFallback: (value: string) => any = jest.fn();
 
-        const fallback = jest.fn().mockReturnValueOnce({
-            // Use Node's A* PromiseLike specification where, once awaiting a value,
-            // if it contains a `then` key, the value at that key is called with a
-            // callback that will reschedule the running microtask with the called value
-            // as the return of the "Promise".
-            // This allows us to test that the cache update is done in the background.
-            then: callback => {
-                thenCallback = callback!;
-
-                return Promise.resolve('fallbackValue');
-            },
-        } as PromiseLike<string>);
+        const fallback = jest.fn().mockReturnValueOnce(
+            new Promise(resolve => { resolveFallback = resolve; }),
+        );
 
         const cache = new StaleWhileRevalidatingCache({
             cacheProvider: mockCache,
@@ -83,7 +82,9 @@ describe('A cache provider wrapper that automatically caches the fallback value 
             retrievalTime: now,
         };
 
-        await expect(thenCallback('fallbackValue')).resolves.toStrictEqual(expectedEntry);
+        resolveFallback('fallbackValue');
+
+        await setPromise;
 
         expect(mockCache.set).toHaveBeenCalledWith('key', expectedEntry);
     });
