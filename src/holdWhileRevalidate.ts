@@ -21,7 +21,6 @@ export class HoldWhileRevalidate<K, V> implements OverridableCacheProvider<K, V>
 
     public async get(key: K, fallback: (key: K) => Promise<V>): Promise<V> {
         const now = Instant.now();
-        const expirationTime = now.plusSeconds(this.freshPeriod);
 
         const retrieveAndSave = (): Promise<TimedCacheEntry<V>> => fallback(key)
             .then(async value => {
@@ -37,7 +36,7 @@ export class HoldWhileRevalidate<K, V> implements OverridableCacheProvider<K, V>
 
         const possiblyStaleEntry = await this.cacheProvider.get(key, retrieveAndSave);
 
-        if (possiblyStaleEntry.retrievalTime.isAfter(expirationTime)) {
+        if (now.isAfter(possiblyStaleEntry.retrievalTime.plusSeconds(this.freshPeriod))) {
             return retrieveAndSave().then(entry => entry.value);
         }
 
