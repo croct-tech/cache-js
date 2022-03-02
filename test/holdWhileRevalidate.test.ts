@@ -1,43 +1,43 @@
 import {Instant} from '@croct-tech/time';
 import {HoldWhileRevalidate, OverridableCacheProvider, TimedCacheEntry} from '../src';
 
-describe('A cache provider wrapper that automatically caches the fallback value synchronously', () => {
+describe('A cache provider wrapper that automatically caches the loader value synchronously', () => {
     const mockCache: jest.MockedObject<OverridableCacheProvider<any, any>> = {
         get: jest.fn(),
         set: jest.fn(),
         delete: jest.fn(),
     };
 
-    it('should returned and save fallback value when not cached', async () => {
+    it('should returned and save loader value when not cached', async () => {
         const now = Instant.fromEpochMillis(12345);
 
-        mockCache.get.mockImplementation((key, fallback) => fallback(key));
+        mockCache.get.mockImplementation((key, loader) => loader(key));
         mockCache.set.mockResolvedValue();
 
         jest.spyOn(Instant, 'now').mockReturnValue(now);
 
-        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+        const loader = jest.fn().mockResolvedValue('loaderValue');
 
         const cache = new HoldWhileRevalidate({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
 
-        await expect(cache.get('key', fallback)).resolves.toBe('fallbackValue');
+        await expect(cache.get('key', loader)).resolves.toBe('loaderValue');
 
         expect(mockCache.get).toHaveBeenCalledWith('key', expect.any(Function));
 
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledWith('key');
 
         const expectedEntry: TimedCacheEntry<string> = {
-            value: 'fallbackValue',
+            value: 'loaderValue',
             retrievalTime: now,
         };
 
         expect(mockCache.set).toHaveBeenCalledWith('key', expectedEntry);
     });
 
-    it('should returned and save fallback value cached data is expired', async () => {
+    it('should returned and save loader value cached data is expired', async () => {
         const now = Instant.fromEpochMillis(12345);
 
         const cachedEntry: TimedCacheEntry<string> = {
@@ -50,21 +50,21 @@ describe('A cache provider wrapper that automatically caches the fallback value 
 
         jest.spyOn(Instant, 'now').mockReturnValue(now);
 
-        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+        const loader = jest.fn().mockResolvedValue('loaderValue');
 
         const cache = new HoldWhileRevalidate({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
 
-        await expect(cache.get('key', fallback)).resolves.toBe('fallbackValue');
+        await expect(cache.get('key', loader)).resolves.toBe('loaderValue');
 
         expect(mockCache.get).toHaveBeenCalledWith('key', expect.any(Function));
 
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledWith('key');
 
         const expectedEntry: TimedCacheEntry<string> = {
-            value: 'fallbackValue',
+            value: 'loaderValue',
             retrievalTime: now,
         };
 
@@ -83,18 +83,18 @@ describe('A cache provider wrapper that automatically caches the fallback value 
 
         jest.spyOn(Instant, 'now').mockReturnValue(now);
 
-        const fallback = jest.fn();
+        const loader = jest.fn();
 
         const cache = new HoldWhileRevalidate({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
 
-        await expect(cache.get('key', fallback)).resolves.toBe('cachedValue');
+        await expect(cache.get('key', loader)).resolves.toBe('cachedValue');
 
         expect(mockCache.get).toHaveBeenCalledWith('key', expect.any(Function));
 
-        expect(fallback).not.toHaveBeenCalled();
+        expect(loader).not.toHaveBeenCalled();
     });
 
     it('should set an entry with the current time', async () => {

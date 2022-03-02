@@ -1,15 +1,15 @@
 import {InMemoryCache} from '../src';
 
 describe('A cache backed by an in-memory hash map', () => {
-    it('should return the fallback value when getting unknown keys', async () => {
+    it('should return the loader value when getting unknown keys', async () => {
         const cache = new InMemoryCache();
 
-        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+        const loader = jest.fn().mockResolvedValue('loaderValue');
 
-        await expect(cache.get('unknown', fallback)).resolves.toBe('fallbackValue');
+        await expect(cache.get('unknown', loader)).resolves.toBe('loaderValue');
 
-        expect(fallback).toHaveBeenCalledTimes(1);
-        expect(fallback).toHaveBeenCalledWith('unknown');
+        expect(loader).toHaveBeenCalledTimes(1);
+        expect(loader).toHaveBeenCalledWith('unknown');
     });
 
     it('should return previously stored values', async () => {
@@ -17,11 +17,11 @@ describe('A cache backed by an in-memory hash map', () => {
 
         await cache.set('key', 'value');
 
-        const fallback = jest.fn();
+        const loader = jest.fn();
 
-        await expect(cache.get('key', fallback)).resolves.toBe('value');
+        await expect(cache.get('key', loader)).resolves.toBe('value');
 
-        expect(fallback).not.toHaveBeenCalled();
+        expect(loader).not.toHaveBeenCalled();
     });
 
     it('should not fail when deleting an unknown key', async () => {
@@ -37,8 +37,8 @@ describe('A cache backed by an in-memory hash map', () => {
 
         await cache.delete('key');
 
-        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+        const loader = jest.fn().mockResolvedValue('loaderValue');
 
-        await expect(cache.get('key', fallback)).resolves.toBe('fallbackValue');
+        await expect(cache.get('key', loader)).resolves.toBe('loaderValue');
     });
 });

@@ -1,16 +1,20 @@
 import {Instant} from '@croct-tech/time';
 
+export type CacheLoader<K, V> = (key: K) => Promise<V>;
+
 export interface CacheProvider<K, V> {
     /**
      * Gets the cached value for the given key. If there is no cached value,
-     * a fresh value is retrieved from the given `fallback` function.
+     * a fresh value is retrieved from the given `loader` function.
      *
      * @param {K} key to the cached value
-     * @param {() => Promise<V>} fallback function to retrieve the fresh value
+     * @param {CacheLoader<K, V>} loader function to retrieve the fresh value
      * @returns {Promise<V>}
      */
-    get(key: K, fallback: (key: K) => Promise<V>): Promise<V>;
+    get(key: K, loader: CacheLoader<K, V>): Promise<V>;
+}
 
+export interface ErasableCacheProvider<K, V> extends CacheProvider<K, V> {
     /**
      * Removes the value for the given key from the cache.
      *
@@ -20,7 +24,7 @@ export interface CacheProvider<K, V> {
     delete(key: K): Promise<void>;
 }
 
-export interface OverridableCacheProvider<K, V> extends CacheProvider<K, V> {
+export interface OverridableCacheProvider<K, V> extends ErasableCacheProvider<K, V> {
     /**
      * Sets the value for the given key.
      *
@@ -47,8 +51,8 @@ export type TimedCacheEntry<T> = Readonly<{
 }>;
 
 export class NoopCache implements OverridableCacheProvider<any, any> {
-    public get(key: any, fallback: (key: any) => any): Promise<any> {
-        return fallback(key);
+    public get(key: any, loader: (key: any) => any): Promise<any> {
+        return loader(key);
     }
 
     public set(): Promise<void> {

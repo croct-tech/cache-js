@@ -1,6 +1,6 @@
 import {JsonCompatible, JsonValue} from '@croct-tech/json';
 import * as hash from 'object-hash';
-import {OverridableCacheProvider} from './cacheProvider';
+import {CacheLoader, OverridableCacheProvider} from './cacheProvider';
 
 export type Adapted<D, S> = (value: D) => S;
 
@@ -60,10 +60,10 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvi
         });
     }
 
-    public get(key: K, fallback: (key: K) => Promise<V>): Promise<V> {
+    public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         return this.cache.get(
             this.keyTransformer(key),
-            () => fallback(key).then(this.valueInputTransformer),
+            () => loader(key).then(this.valueInputTransformer),
         ).then(this.valueOutputTransformer);
     }
 

@@ -8,19 +8,19 @@ describe('A cache adapter that can transform keys and values', () => {
     };
 
     it('should apply the key transformer when getting a value', async () => {
-        mockCache.get.mockImplementation((key, fallback) => fallback(key));
+        mockCache.get.mockImplementation((key, loader) => loader(key));
 
         const transformer = jest.fn().mockReturnValueOnce('transformed');
 
-        const fallback = jest.fn().mockResolvedValue('value');
+        const loader = jest.fn().mockResolvedValue('value');
 
         const cache = AdaptedCache.transformKeys(mockCache, transformer);
 
-        const result = await cache.get('key', fallback);
+        const result = await cache.get('key', loader);
 
         expect(transformer).toHaveBeenCalledWith('key');
         expect(mockCache.get).toHaveBeenCalledWith('transformed', expect.any(Function));
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledWith('key');
         expect(result).toBe('value');
     });
 
@@ -56,7 +56,7 @@ describe('A cache adapter that can transform keys and values', () => {
         const inputTransformer = jest.fn();
         const outputTransformer = jest.fn().mockReturnValueOnce('transformed');
 
-        const fallback = jest.fn();
+        const loader = jest.fn();
 
         const cache = AdaptedCache.transformValues(
             mockCache,
@@ -64,22 +64,22 @@ describe('A cache adapter that can transform keys and values', () => {
             outputTransformer,
         );
 
-        const result = await cache.get('key', fallback);
+        const result = await cache.get('key', loader);
 
         expect(inputTransformer).not.toHaveBeenCalled();
         expect(outputTransformer).toHaveBeenCalledWith('value');
         expect(result).toBe('transformed');
 
-        expect(fallback).not.toHaveBeenCalled();
+        expect(loader).not.toHaveBeenCalled();
     });
 
-    it('should apply the value input transformer on fallback value', async () => {
-        mockCache.get.mockImplementation((key, fallback) => fallback(key));
+    it('should apply the value input transformer on loader value', async () => {
+        mockCache.get.mockImplementation((key, loader) => loader(key));
 
         const inputTransformer = jest.fn().mockReturnValueOnce('transformedInput');
         const outputTransformer = jest.fn().mockReturnValueOnce('transformedOutput');
 
-        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+        const loader = jest.fn().mockResolvedValue('loaderValue');
 
         const cache = AdaptedCache.transformValues(
             mockCache,
@@ -87,11 +87,11 @@ describe('A cache adapter that can transform keys and values', () => {
             outputTransformer,
         );
 
-        const result = await cache.get('key', fallback);
+        const result = await cache.get('key', loader);
 
-        expect(inputTransformer).toHaveBeenCalledWith('fallbackValue');
+        expect(inputTransformer).toHaveBeenCalledWith('loaderValue');
         expect(outputTransformer).toHaveBeenCalledWith('transformedInput');
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledWith('key');
         expect(result).toBe('transformedOutput');
     });
 

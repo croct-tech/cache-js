@@ -8,7 +8,7 @@ describe('A cache backed by Redis', () => {
         del: jest.fn(),
     } as jest.MockedObject<Redis.Redis>;
 
-    it('should return the fallback value when there is no entry on Redis', async () => {
+    it('should return the loader value when there is no entry on Redis', async () => {
         mockedRedis.get.mockResolvedValue(null);
 
         const cache = new RedisCache({
@@ -16,14 +16,14 @@ describe('A cache backed by Redis', () => {
             ttl: 10,
         });
 
-        const fallback = jest.fn().mockResolvedValue('fallbackValue');
+        const loader = jest.fn().mockResolvedValue('loaderValue');
 
-        await expect(cache.get('key', fallback)).resolves.toBe('fallbackValue');
+        await expect(cache.get('key', loader)).resolves.toBe('loaderValue');
 
         expect(mockedRedis.get).toHaveBeenCalledWith('key');
 
-        expect(fallback).toHaveBeenCalledTimes(1);
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledTimes(1);
+        expect(loader).toHaveBeenCalledWith('key');
     });
 
     it('should return the cached value', async () => {
@@ -34,13 +34,13 @@ describe('A cache backed by Redis', () => {
             ttl: 10,
         });
 
-        const fallback = jest.fn();
+        const loader = jest.fn();
 
-        await expect(cache.get('key', fallback)).resolves.toBe('cachedValue');
+        await expect(cache.get('key', loader)).resolves.toBe('cachedValue');
 
         expect(mockedRedis.get).toHaveBeenCalledWith('key');
 
-        expect(fallback).not.toHaveBeenCalled();
+        expect(loader).not.toHaveBeenCalled();
     });
 
     it('should save the given data to Redis', async () => {

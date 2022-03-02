@@ -6,10 +6,10 @@ import {OverridableCacheProvider} from './cacheProvider';
 export class InMemoryCache<T = any> implements OverridableCacheProvider<string, T> {
     private cache = new Map<string, T>();
 
-    public get(key: string, fallback: (key: string) => Promise<T>): Promise<T> {
+    public get(key: string, loader: (key: string) => Promise<T>): Promise<T> {
         return this.cache.has(key)
             ? Promise.resolve(this.cache.get(key)!)
-            : fallback(key);
+            : loader(key);
     }
 
     public set(key: string, value: T): Promise<void> {

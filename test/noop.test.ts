@@ -1,16 +1,16 @@
 import {NoopCache, OverridableCacheProvider} from '../src';
 
 describe('A no-op cache', () => {
-    it('should always return the fallback on get', async () => {
+    it('should always return the loader on get', async () => {
         const cache: OverridableCacheProvider<any, any> = new NoopCache();
 
         const sentinelResult = jest.fn();
-        const fallback = jest.fn().mockResolvedValue(sentinelResult);
+        const loader = jest.fn().mockResolvedValue(sentinelResult);
 
-        await expect(cache.get('key', fallback)).resolves.toBe(sentinelResult);
+        await expect(cache.get('key', loader)).resolves.toBe(sentinelResult);
 
-        expect(fallback).toHaveBeenCalledTimes(1);
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledTimes(1);
+        expect(loader).toHaveBeenCalledWith('key');
     });
 
     it('should not fail to set a value', async () => {

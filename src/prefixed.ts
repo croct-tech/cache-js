@@ -13,8 +13,8 @@ export class PrefixedCache<V> implements OverridableCacheProvider<string, V> {
         this.prefix = prefix;
     }
 
-    public get(key: string, fallback: (key: string) => Promise<V>): Promise<V> {
-        return this.inner.get(`${this.prefix}/${key}`, () => fallback(key));
+    public get(key: string, loader: (key: string) => Promise<V>): Promise<V> {
+        return this.inner.get(`${this.prefix}/${key}`, () => loader(key));
     }
 
     public set(key: string, value: V): Promise<void> {

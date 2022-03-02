@@ -8,17 +8,17 @@ describe('A cache wrapper that adds a prefix to the keys', () => {
     };
 
     it('should add the prefix when getting a value', async () => {
-        mockCache.get.mockImplementation((key, fallback) => fallback(key));
+        mockCache.get.mockImplementation((key, loader) => loader(key));
 
         const cache = new PrefixedCache(mockCache, 'prefix');
-        const fallback = jest.fn().mockResolvedValue('value');
+        const loader = jest.fn().mockResolvedValue('value');
 
-        await expect(cache.get('key', fallback)).resolves.toBe('value');
+        await expect(cache.get('key', loader)).resolves.toBe('value');
 
         expect(mockCache.get).toHaveBeenCalledWith('prefix/key', expect.any(Function));
 
-        expect(fallback).toHaveBeenCalledTimes(1);
-        expect(fallback).toHaveBeenCalledWith('key');
+        expect(loader).toHaveBeenCalledTimes(1);
+        expect(loader).toHaveBeenCalledWith('key');
     });
 
     it('should add the prefix when setting a value', async () => {

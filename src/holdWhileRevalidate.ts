@@ -1,5 +1,5 @@
 import {Instant} from '@croct-tech/time';
-import {OverridableCacheProvider, TimedCacheEntry} from './cacheProvider';
+import {CacheLoader, OverridableCacheProvider, TimedCacheEntry} from './cacheProvider';
 
 type Configuration<K, V> = {
     cacheProvider: OverridableCacheProvider<K, TimedCacheEntry<V>>,
@@ -19,10 +19,10 @@ export class HoldWhileRevalidate<K, V> implements OverridableCacheProvider<K, V>
         this.freshPeriod = freshPeriod;
     }
 
-    public async get(key: K, fallback: (key: K) => Promise<V>): Promise<V> {
+    public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         const now = Instant.now();
 
-        const retrieveAndSave = (): Promise<TimedCacheEntry<V>> => fallback(key)
+        const retrieveAndSave = (): Promise<TimedCacheEntry<V>> => loader(key)
             .then(async value => {
                 const entry = {
                     value: value,

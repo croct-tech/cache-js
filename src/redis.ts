@@ -22,11 +22,11 @@ export class RedisCache implements CacheProvider<string, string> {
         this.ttl = ttl;
     }
 
-    public async get(key: string, fallback: (key: string) => Promise<string>): Promise<string> {
+    public async get(key: string, loader: (key: string) => Promise<string>): Promise<string> {
         const entry = await this.redis.get(key);
 
         return entry == null
-            ? fallback(key)
+            ? loader(key)
             : entry;
     }
 
