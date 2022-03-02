@@ -1,0 +1,16 @@
+{
+  "name": "cache-examples",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "run-example": "ts-node",
+    "run-all-examples": "ls -xw 1 src | xargs -i bash -c 'echo \"\nRunning {}...\n\"; ts-node src/{}'"
+  },
+  "dependencies": {
+    "@croct-tech/cache": "file:../../build"
+  },
+  "devDependencies": {
+    "ts-node": "^10.6.0",
+    "typescript": "^4.6.2"
+  }
+}
