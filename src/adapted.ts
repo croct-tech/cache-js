@@ -2,26 +2,30 @@ import {JsonCompatible, JsonValue} from '@croct-tech/json';
 import * as hash from 'object-hash';
 import {CacheLoader, OverridableCacheProvider} from './cacheProvider';
 
-export type Adapted<D, S> = (value: D) => S;
+export type Transformer<D, S> = (value: D) => S;
 
 type Configuration<K, V, IK, IV> = {
     cache: OverridableCacheProvider<IK, IV>,
-    keyTransformer: Adapted<K, IK>,
-    valueInputTransformer: Adapted<V, IV>,
-    valueOutputTransformer: Adapted<IV, V>,
+    keyTransformer: Transformer<K, IK>,
+    valueInputTransformer: Transformer<V, IV>,
+    valueOutputTransformer: Transformer<IV, V>,
 };
 
+function identity<T>(value: T): T {
+    return value;
+}
+
 /**
- * A cache wrapper that can transform the key and value before storing them in the cache.
+ * A cache provider to transform keys and values between composition layers.
  */
 export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvider<K, V> {
     private readonly cache: OverridableCacheProvider<IK, IV>;
 
-    private readonly keyTransformer: Adapted<K, IK>;
+    private readonly keyTransformer: Transformer<K, IK>;
 
-    private readonly valueInputTransformer: Adapted<V, IV>;
+    private readonly valueInputTransformer: Transformer<V, IV>;
 
-    private readonly valueOutputTransformer: Adapted<IV, V>;
+    private readonly valueOutputTransformer: Transformer<IV, V>;
 
     public constructor({
         cache,
@@ -37,24 +41,24 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvi
 
     public static transformKeys<K, IK, V>(
         cache: OverridableCacheProvider<IK, V>,
-        keyTransformer: Adapted<K, IK>,
+        keyTransformer: Transformer<K, IK>,
     ): AdaptedCache<K, V, IK, V> {
         return new AdaptedCache({
             cache: cache,
             keyTransformer: keyTransformer,
-            valueInputTransformer: value => value,
-            valueOutputTransformer: value => value,
+            valueInputTransformer: identity,
+            valueOutputTransformer: identity,
         });
     }
 
     public static transformValues<K, V, IV>(
         cache: OverridableCacheProvider<K, IV>,
-        inputTransformer: Adapted<V, IV>,
-        outputTransformer: Adapted<IV, V>,
+        inputTransformer: Transformer<V, IV>,
+        outputTransformer: Transformer<IV, V>,
     ): AdaptedCache<K, V, K, IV> {
         return new AdaptedCache({
             cache: cache,
-            keyTransformer: key => key,
+            keyTransformer: identity,
             valueInputTransformer: inputTransformer,
             valueOutputTransformer: outputTransformer,
         });
@@ -78,24 +82,30 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvi
         return this.cache.delete(this.keyTransformer(key));
     }
 
-    public static createHashSerializer(
-        alg?: hash.Options['algorithm'],
-    ): Adapted<any, string> {
+    public static createHashSerializer(algorithm?: hash.Options['algorithm']): Transformer<any, string> {
         const options: hash.Options = {
             encoding: 'base64',
-            algorithm: alg,
+            algorithm: algorithm,
         };
 
         return (value: any): string => hash(value, options);
     }
 
-    // Type-safe wrapper around JSON.stringify
-    public static jsonSerializer<T extends JsonCompatible>(): Adapted<T, string> {
+    /**
+     * Serializes a JSON compatible value to a string using JSON.stringify.
+     *
+     * This is a helper function for type safety.
+      */
+    public static jsonSerializer<T extends JsonCompatible>(): Transformer<T, string> {
         return JSON.stringify;
     }
 
-    // Type-safe wrapper around JSON.parse
-    public static jsonDeserializer<T extends JsonValue>(): Adapted<string, T> {
+    /**
+     * Deserializes a string into a JSON value using JSON.parse.
+     *
+     * This is a helper function for type safety.
+      */
+    public static jsonDeserializer<T extends JsonValue>(): Transformer<string, T> {
         return JSON.parse;
     }
 }

@@ -1,16 +1,19 @@
 import {Instant} from '@croct-tech/time';
-import {CacheLoader, OverridableCacheProvider, TimedCacheEntry} from './cacheProvider';
+import {CacheLoader, OverridableCacheProvider} from './cacheProvider';
+import {TimestampedCacheEntry} from './timestampedCacheEntry';
 
 type Configuration<K, V> = {
-    cacheProvider: OverridableCacheProvider<K, TimedCacheEntry<V>>,
+    cacheProvider: OverridableCacheProvider<K, TimestampedCacheEntry<V>>,
     freshPeriod: number,
 
-    // Handler for background revalidation errors
+    /**
+     * Handler for background revalidation errors
+     */
     errorHandler?: (error: Error) => void,
 };
 
-export class StaleWhileRevalidatingCache<K, V> implements OverridableCacheProvider<K, V> {
-    private readonly cacheProvider: OverridableCacheProvider<K, TimedCacheEntry<V>>;
+export class StaleWhileRevalidateCache<K, V> implements OverridableCacheProvider<K, V> {
+    private readonly cacheProvider: Configuration<K, V>['cacheProvider'];
 
     private readonly freshPeriod: number;
 
@@ -29,21 +32,20 @@ export class StaleWhileRevalidatingCache<K, V> implements OverridableCacheProvid
     public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         const now = Instant.now();
 
-        const retrieveAndSave = (): Promise<TimedCacheEntry<V>> => loader(key)
-            .then(async value => {
-                const entry = {
-                    value: value,
-                    retrievalTime: now,
-                };
+        const retrieveAndSave = async (): Promise<TimestampedCacheEntry<V>> => {
+            const entry: TimestampedCacheEntry<V> = {
+                value: await loader(key),
+                timestamp: now,
+            };
 
-                await this.cacheProvider.set(key, entry);
+            await this.cacheProvider.set(key, entry);
 
-                return entry;
-            });
+            return entry;
+        };
 
         const possiblyStaleEntry = await this.cacheProvider.get(key, retrieveAndSave);
 
-        if (now.isAfter(possiblyStaleEntry.retrievalTime.plusSeconds(this.freshPeriod))) {
+        if (now.isAfter(possiblyStaleEntry.timestamp.plusSeconds(this.freshPeriod))) {
             // If expired revalidate on the background and return cached value
             retrieveAndSave().catch(this.errorHandler);
         }
@@ -54,7 +56,7 @@ export class StaleWhileRevalidatingCache<K, V> implements OverridableCacheProvid
     public set(key: K, value: V): Promise<void> {
         return this.cacheProvider.set(key, {
             value: value,
-            retrievalTime: Instant.now(),
+            timestamp: Instant.now(),
         });
     }
 

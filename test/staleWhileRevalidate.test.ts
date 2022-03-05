@@ -1,5 +1,5 @@
 import {Instant} from '@croct-tech/time';
-import {OverridableCacheProvider, StaleWhileRevalidatingCache, TimedCacheEntry} from '../src';
+import {OverridableCacheProvider, StaleWhileRevalidateCache, TimestampedCacheEntry} from '../src';
 
 describe('A cache provider wrapper that automatically caches the loader value in the background', () => {
     const mockCache: jest.MockedObject<OverridableCacheProvider<any, any>> = {
@@ -18,7 +18,7 @@ describe('A cache provider wrapper that automatically caches the loader value in
 
         const loader = jest.fn().mockResolvedValue('loaderValue');
 
-        const cache = new StaleWhileRevalidatingCache({
+        const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
@@ -29,9 +29,9 @@ describe('A cache provider wrapper that automatically caches the loader value in
 
         expect(loader).toHaveBeenCalledWith('key');
 
-        const expectedEntry: TimedCacheEntry<string> = {
+        const expectedEntry: TimestampedCacheEntry<string> = {
             value: 'loaderValue',
-            retrievalTime: now,
+            timestamp: now,
         };
 
         expect(mockCache.set).toHaveBeenCalledWith('key', expectedEntry);
@@ -40,9 +40,9 @@ describe('A cache provider wrapper that automatically caches the loader value in
     it('should returned and save loader value when cached data is expired', async () => {
         const now = Instant.fromEpochMillis(12345);
 
-        const cachedEntry: TimedCacheEntry<string> = {
+        const cachedEntry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
-            retrievalTime: now.plusSeconds(-11),
+            timestamp: now.plusSeconds(-11),
         };
 
         mockCache.get.mockResolvedValue(cachedEntry);
@@ -64,7 +64,7 @@ describe('A cache provider wrapper that automatically caches the loader value in
             new Promise(resolve => { resolveloader = resolve; }),
         );
 
-        const cache = new StaleWhileRevalidatingCache({
+        const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
@@ -77,9 +77,9 @@ describe('A cache provider wrapper that automatically caches the loader value in
 
         expect(mockCache.set).not.toHaveBeenCalled();
 
-        const expectedEntry: TimedCacheEntry<string> = {
+        const expectedEntry: TimestampedCacheEntry<string> = {
             value: 'loaderValue',
-            retrievalTime: now,
+            timestamp: now,
         };
 
         resolveloader('loaderValue');
@@ -92,9 +92,9 @@ describe('A cache provider wrapper that automatically caches the loader value in
     it('should returned the cached value if not expired', async () => {
         const now = Instant.fromEpochMillis(12345);
 
-        const entry: TimedCacheEntry<string> = {
+        const entry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
-            retrievalTime: now.plusSeconds(-5),
+            timestamp: now.plusSeconds(-5),
         };
 
         mockCache.get.mockResolvedValue(entry);
@@ -103,7 +103,7 @@ describe('A cache provider wrapper that automatically caches the loader value in
 
         const loader = jest.fn();
 
-        const cache = new StaleWhileRevalidatingCache({
+        const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
@@ -122,16 +122,16 @@ describe('A cache provider wrapper that automatically caches the loader value in
 
         jest.spyOn(Instant, 'now').mockReturnValue(now);
 
-        const cache = new StaleWhileRevalidatingCache({
+        const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });
 
         await cache.set('key', 'value');
 
-        const expectedEntry: TimedCacheEntry<string> = {
+        const expectedEntry: TimestampedCacheEntry<string> = {
             value: 'value',
-            retrievalTime: now,
+            timestamp: now,
         };
 
         expect(mockCache.set).toHaveBeenCalledWith('key', expectedEntry);
@@ -140,7 +140,7 @@ describe('A cache provider wrapper that automatically caches the loader value in
     it('should forward the deletion of a key', async () => {
         mockCache.delete.mockResolvedValue();
 
-        const cache = new StaleWhileRevalidatingCache({
+        const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
         });

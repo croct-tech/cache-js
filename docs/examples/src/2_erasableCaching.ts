@@ -1,7 +1,7 @@
 import {
     CacheLoader,
     ErasableCacheProvider,
-    HoldWhileRevalidate,
+    HoldWhileRevalidateCache,
     InMemoryCache,
 } from '../../../src';
 
@@ -69,9 +69,9 @@ class CachedRepository implements FooRepository {
 async function main(): Promise<void> {
     const randomRepository = new RandomRepository();
 
-    const cache = new HoldWhileRevalidate<string, Foo>({
+    const cache = new HoldWhileRevalidateCache<string, Foo>({
         cacheProvider: new InMemoryCache(),
-        freshPeriod: 100,
+        maxAge: 100,
     });
 
     const cachedRepository = new CachedRepository(randomRepository, cache);
