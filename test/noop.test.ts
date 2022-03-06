@@ -1,7 +1,7 @@
 import {NoopCache, OverridableCacheProvider} from '../src';
 
 describe('A no-op cache', () => {
-    it('should always return the loader on get', async () => {
+    it('should load fresh values', async () => {
         const cache: OverridableCacheProvider<any, any> = new NoopCache();
 
         const sentinelResult = jest.fn();

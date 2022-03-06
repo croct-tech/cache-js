@@ -8,7 +8,7 @@ describe('A cache backed by Redis', () => {
         del: jest.fn(),
     } as jest.MockedObject<Redis.Redis>;
 
-    it('should return the loader value when there is no entry on Redis', async () => {
+    it('should load and return a fresh value when the key is not found in Redis', async () => {
         mockedRedis.get.mockResolvedValue(null);
 
         const cache = new RedisCache({
@@ -26,7 +26,7 @@ describe('A cache backed by Redis', () => {
         expect(loader).toHaveBeenCalledWith('key');
     });
 
-    it('should return the cached value', async () => {
+    it('should return cached values from Redis', async () => {
         mockedRedis.get.mockResolvedValue('cachedValue');
 
         const cache = new RedisCache({
@@ -43,7 +43,7 @@ describe('A cache backed by Redis', () => {
         expect(loader).not.toHaveBeenCalled();
     });
 
-    it('should save the given data to Redis', async () => {
+    it('should store values into Redis', async () => {
         mockedRedis.setex.mockResolvedValue('OK');
 
         const cache = new RedisCache({
@@ -56,7 +56,7 @@ describe('A cache backed by Redis', () => {
         expect(mockedRedis.setex).toHaveBeenCalledWith('key', 10, 'value');
     });
 
-    it('should delete the entry from Redis', async () => {
+    it('should delete values from Redis', async () => {
         mockedRedis.del.mockResolvedValue(1);
 
         const cache = new RedisCache({

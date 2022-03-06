@@ -1,7 +1,7 @@
 import {InMemoryCache} from '../src';
 
 describe('A cache backed by an in-memory hash map', () => {
-    it('should return the loader value when getting unknown keys', async () => {
+    it('should load and return a fresh value when the key is not found', async () => {
         const cache = new InMemoryCache();
 
         const loader = jest.fn().mockResolvedValue('loaderValue');
@@ -12,7 +12,7 @@ describe('A cache backed by an in-memory hash map', () => {
         expect(loader).toHaveBeenCalledWith('unknown');
     });
 
-    it('should return previously stored values', async () => {
+    it('should return cached values', async () => {
         const cache = new InMemoryCache();
 
         await cache.set('key', 'value');
