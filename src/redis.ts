@@ -14,10 +14,7 @@ export class RedisCache implements CacheProvider<string, string> {
 
     private readonly ttl: number;
 
-    public constructor({
-        redis,
-        ttl,
-    }: Configuration) {
+    public constructor({redis, ttl}: Configuration) {
         this.redis = redis;
         this.ttl = ttl;
     }
