@@ -1,9 +1,9 @@
-import {OverridableCacheProvider} from './cacheProvider';
+import {CacheProvider} from './cacheProvider';
 
 /**
  * In-memory cache implementation backed by a native `Map`.
  */
-export class InMemoryCache<T = any> implements OverridableCacheProvider<string, T> {
+export class InMemoryCache<T = any> implements CacheProvider<string, T> {
     private cache = new Map<string, T>();
 
     public get(key: string, loader: (key: string) => Promise<T>): Promise<T> {

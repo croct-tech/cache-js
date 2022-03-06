@@ -1,7 +1,7 @@
-import {AdaptedCache, OverridableCacheProvider} from '../src';
+import {AdaptedCache, CacheProvider} from '../src';
 
 describe('A cache adapter that can transform keys and values', () => {
-    const mockCache: jest.MockedObject<OverridableCacheProvider<string, string>> = {
+    const mockCache: jest.MockedObject<CacheProvider<string, string>> = {
         get: jest.fn(),
         set: jest.fn(),
         delete: jest.fn(),

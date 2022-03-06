@@ -1,14 +1,14 @@
-import {OverridableCacheProvider} from './cacheProvider';
+import {CacheProvider} from './cacheProvider';
 
 /**
  * A cache that prefixes keys with a string.
  */
-export class PrefixedCache<V> implements OverridableCacheProvider<string, V> {
-    private readonly inner: OverridableCacheProvider<string, V>;
+export class PrefixedCache<V> implements CacheProvider<string, V> {
+    private readonly inner: CacheProvider<string, V>;
 
     private readonly prefix: string;
 
-    public constructor(inner: OverridableCacheProvider<string, V>, prefix: string) {
+    public constructor(inner: CacheProvider<string, V>, prefix: string) {
         this.inner = inner;
         this.prefix = prefix;
     }

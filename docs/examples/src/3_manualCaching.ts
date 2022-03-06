@@ -1,4 +1,4 @@
-import {CacheLoader, InMemoryCache, OverridableCacheProvider} from '../../../src';
+import {CacheLoader, CacheProvider, InMemoryCache} from '../../../src';
 
 type Foo = {
     value: string,
@@ -39,11 +39,11 @@ class RandomRepository implements FooRepository {
 class CachedRepository implements FooRepository {
     private readonly repository: FooRepository;
 
-    private readonly cache: OverridableCacheProvider<string, Foo>;
+    private readonly cache: CacheProvider<string, Foo>;
 
     public constructor(
         repository: FooRepository,
-        cache: OverridableCacheProvider<string, Foo>,
+        cache: CacheProvider<string, Foo>,
     ) {
         this.repository = repository;
         this.cache = cache;

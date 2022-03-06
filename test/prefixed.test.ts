@@ -1,7 +1,7 @@
-import {OverridableCacheProvider, PrefixedCache} from '../src';
+import {CacheProvider, PrefixedCache} from '../src';
 
 describe('A cache wrapper that adds a prefix to the keys', () => {
-    const mockCache: jest.MockedObject<OverridableCacheProvider<string, string>> = {
+    const mockCache: jest.MockedObject<CacheProvider<string, string>> = {
         get: jest.fn(),
         set: jest.fn(),
         delete: jest.fn(),

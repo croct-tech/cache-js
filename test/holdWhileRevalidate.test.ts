@@ -1,8 +1,8 @@
 import {Instant} from '@croct-tech/time';
-import {HoldWhileRevalidateCache, OverridableCacheProvider, TimestampedCacheEntry} from '../src';
+import {CacheProvider, HoldWhileRevalidateCache, TimestampedCacheEntry} from '../src';
 
 describe('A cache provider that holds while revalidating the cache', () => {
-    const mockCache: jest.MockedObject<OverridableCacheProvider<any, any>> = {
+    const mockCache: jest.MockedObject<CacheProvider<any, any>> = {
         get: jest.fn(),
         set: jest.fn(),
         delete: jest.fn(),

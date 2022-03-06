@@ -1,9 +1,4 @@
-import {
-    CacheLoader,
-    ErasableCacheProvider,
-    HoldWhileRevalidateCache,
-    InMemoryCache,
-} from '../../../src';
+import {CacheLoader, CacheProvider, HoldWhileRevalidateCache, InMemoryCache} from '../../../src';
 
 type Foo = {
     value: string,
@@ -36,11 +31,11 @@ class RandomRepository implements FooRepository {
 class CachedRepository implements FooRepository {
     private readonly repository: FooRepository;
 
-    private readonly cache: ErasableCacheProvider<string, Foo>;
+    private readonly cache: CacheProvider<string, Foo>;
 
     public constructor(
         repository: FooRepository,
-        cache: ErasableCacheProvider<string, Foo>,
+        cache: CacheProvider<string, Foo>,
     ) {
         this.repository = repository;
         this.cache = cache;

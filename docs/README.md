@@ -23,13 +23,15 @@ class Cached {
 
 See an example of a cached repository [here](examples/src/1_simpleCaching.ts).
 
-# Interfaces
+# Methods
 
-The cache API provided by this library is divided into 3 interfaces, each one extending the previous:
+The cache API provided by this library defined as the interface `CacheProvider<K, V>`, where `K` is the
+type of the key used to identify the cached value, and `V` is the type of the value to be cached.
 
-## CacheProvider
+The interface provides the following methods:
 
-The `CacheProvider<K, V>` interface provides the `get` method with the following signature:
+## GET
+
 ```typescript
 type CacheLoader<K, V> = (key: K) => Promise<V>;
 
@@ -43,26 +45,24 @@ When and how the function is called is up to the cache implementation. It is als
 to automatically cache the loaded value or not, see [Implementations](#implementations) to know which ones
 do and do not auto-cache.
 
-See an example of a cached read-only repository [here](examples/src/1_simpleCaching.ts) using this interface.
+See an example of a cached read-only repository [here](examples/src/1_simpleCaching.ts) using this method.
 
-## ErasableCacheProvider
+## DELETE
 
-The `ErasableCacheProvider<K, V>` interface extends the `CacheProvider<K, V>` interface with the `delete` method:
 ```typescript
-interface ErasableCacheProvider<K, V> extends CacheProvider<K, V> {
+interface CacheProvider<K, V> extends CacheProvider<K, V> {
   delete(key: K): Promise<void>;
 }
 ```
 
 The `delete` method accepts a key and removes the corresponding value from the cache.
 
-See an example of a cached repository [here](examples/src/2_erasableCaching.ts) using this interface.
+See an example of a cached repository [here](examples/src/2_erasableCaching.ts) using this method.
 
-## OverridableCacheProvider
+## SET
 
-The `OverridableCacheProvider<K, V>` interface extends the `ErasableCacheProvider<K, V>` interface with the `set` method:
 ```typescript
-interface OverridableCacheProvider<K, V> extends ErasableCacheProvider<K, V> {
+interface CacheProvider<K, V> extends CacheProvider<K, V> {
   set(key: K, value: V): Promise<void>;
 }
 ```
@@ -70,7 +70,11 @@ interface OverridableCacheProvider<K, V> extends ErasableCacheProvider<K, V> {
 The `set` method accepts a key and a value and sets the corresponding value in the cache,
 overriding any previous entry present in the cache regardless of whether it was set manually or automatically.
 
-See an example of a manually cached repository [here](examples/src/3_manualCaching.ts) using this interface.
+Normally you won't need to use this method to cache a value on a read operation. You can count on the cache itself
+to save the value automatically when it uses the loader. This way you can define the strategy for caching in the
+wiring of the application. You can also not wire an auto-save strategy and have the cache only return values cached manually.
+
+See an example of a manually cached repository [here](examples/src/3_manualCaching.ts) using this method.
 
 # Implementations
 

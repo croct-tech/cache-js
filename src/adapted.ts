@@ -1,11 +1,11 @@
 import {JsonCompatible, JsonValue} from '@croct-tech/json';
 import * as hash from 'object-hash';
-import {CacheLoader, OverridableCacheProvider} from './cacheProvider';
+import {CacheLoader, CacheProvider} from './cacheProvider';
 
 export type Transformer<D, S> = (value: D) => S;
 
 type Configuration<K, V, IK, IV> = {
-    cache: OverridableCacheProvider<IK, IV>,
+    cache: CacheProvider<IK, IV>,
     keyTransformer: Transformer<K, IK>,
     valueInputTransformer: Transformer<V, IV>,
     valueOutputTransformer: Transformer<IV, V>,
@@ -18,8 +18,8 @@ function identity<T>(value: T): T {
 /**
  * A cache provider to transform keys and values between composition layers.
  */
-export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvider<K, V> {
-    private readonly cache: OverridableCacheProvider<IK, IV>;
+export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
+    private readonly cache: CacheProvider<IK, IV>;
 
     private readonly keyTransformer: Transformer<K, IK>;
 
@@ -40,7 +40,7 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvi
     }
 
     public static transformKeys<K, IK, V>(
-        cache: OverridableCacheProvider<IK, V>,
+        cache: CacheProvider<IK, V>,
         keyTransformer: Transformer<K, IK>,
     ): AdaptedCache<K, V, IK, V> {
         return new AdaptedCache({
@@ -52,7 +52,7 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements OverridableCacheProvi
     }
 
     public static transformValues<K, V, IV>(
-        cache: OverridableCacheProvider<K, IV>,
+        cache: CacheProvider<K, IV>,
         inputTransformer: Transformer<V, IV>,
         outputTransformer: Transformer<IV, V>,
     ): AdaptedCache<K, V, K, IV> {

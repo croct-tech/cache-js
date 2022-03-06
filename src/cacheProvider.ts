@@ -11,9 +11,7 @@ export interface CacheProvider<K, V> {
      * @returns {Promise<V>} A promise that resolves to the latest cached value.
      */
     get(key: K, loader: CacheLoader<K, V>): Promise<V>;
-}
 
-export interface ErasableCacheProvider<K, V> extends CacheProvider<K, V> {
     /**
      * Removes the value for the given key from the cache.
      *
@@ -21,9 +19,7 @@ export interface ErasableCacheProvider<K, V> extends CacheProvider<K, V> {
      * @returns {Promise<void>}
      */
     delete(key: K): Promise<void>;
-}
 
-export interface OverridableCacheProvider<K, V> extends ErasableCacheProvider<K, V> {
     /**
      * Sets the value for the given key.
      *

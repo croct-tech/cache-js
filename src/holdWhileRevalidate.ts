@@ -1,13 +1,13 @@
 import {Instant} from '@croct-tech/time';
-import {CacheLoader, OverridableCacheProvider} from './cacheProvider';
+import {CacheLoader, CacheProvider} from './cacheProvider';
 import {TimestampedCacheEntry} from './timestampedCacheEntry';
 
 type Configuration<K, V> = {
-    cacheProvider: OverridableCacheProvider<K, TimestampedCacheEntry<V>>,
+    cacheProvider: CacheProvider<K, TimestampedCacheEntry<V>>,
     maxAge: number,
 };
 
-export class HoldWhileRevalidateCache<K, V> implements OverridableCacheProvider<K, V> {
+export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
     private readonly cacheProvider: Configuration<K, V>['cacheProvider'];
 
     private readonly maxAge: number;

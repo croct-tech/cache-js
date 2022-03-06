@@ -1,8 +1,8 @@
-import {NoopCache, OverridableCacheProvider} from '../src';
+import {CacheProvider, NoopCache} from '../src';
 
 describe('A no-op cache', () => {
     it('should load fresh values', async () => {
-        const cache: OverridableCacheProvider<any, any> = new NoopCache();
+        const cache: CacheProvider<any, any> = new NoopCache();
 
         const sentinelResult = jest.fn();
         const loader = jest.fn().mockResolvedValue(sentinelResult);
@@ -14,13 +14,13 @@ describe('A no-op cache', () => {
     });
 
     it('should not fail to set a value', async () => {
-        const cache: OverridableCacheProvider<any, any> = new NoopCache();
+        const cache: CacheProvider<any, any> = new NoopCache();
 
         await expect(cache.set('key', 'value')).resolves.toBeUndefined();
     });
 
     it('should not fail to delete a value', async () => {
-        const cache: OverridableCacheProvider<any, any> = new NoopCache();
+        const cache: CacheProvider<any, any> = new NoopCache();
 
         await expect(cache.delete('key')).resolves.toBeUndefined();
     });
