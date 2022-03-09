@@ -28,7 +28,7 @@
     "test": "jest -c jest.config.js --coverage",
     "validate": "tsc --noEmit",
     "install:examples": "cd docs/examples && npm install",
-    "validate:examples": "tsc --noEmit -p docs/examples/tsconfig.json",
+    "validate:examples": "tsc --noEmit -p examples/tsconfig.json",
     "build": "tsc -p tsconfig.build.json && cp package.json build/"
   },
   "dependencies": {
