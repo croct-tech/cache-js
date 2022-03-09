@@ -1,4 +1,9 @@
-import {CacheLoader, CacheProvider, HoldWhileRevalidateCache, InMemoryCache} from '../../../src';
+import {
+    CacheLoader,
+    CacheProvider,
+    HoldWhileRevalidateCache,
+    InMemoryCache,
+} from '@croct-tech/cache';
 
 type Foo = {
     value: string,
@@ -7,8 +12,6 @@ type Foo = {
 
 interface FooRepository {
     get(id: string): Promise<Foo>;
-
-    delete(id: string): Promise<void>;
 }
 
 class RandomRepository implements FooRepository {
@@ -19,12 +22,6 @@ class RandomRepository implements FooRepository {
             value: id,
             accessTime: Date.now(),
         });
-    }
-
-    public delete(id: string): Promise<void> {
-        console.log(`Deleting ${id} from random repository`);
-
-        return Promise.resolve();
     }
 }
 
@@ -50,15 +47,6 @@ class CachedRepository implements FooRepository {
 
         return this.cache.get(id, this.cacheLoader);
     }
-
-    public async delete(id: string): Promise<void> {
-        console.log(`Deleting ${id} from cached repository`);
-
-        await Promise.all([
-            this.repository.delete(id),
-            this.cache.delete(id),
-        ]);
-    }
 }
 
 async function main(): Promise<void> {
@@ -66,7 +54,7 @@ async function main(): Promise<void> {
 
     const cache = new HoldWhileRevalidateCache<string, Foo>({
         cacheProvider: new InMemoryCache(),
-        maxAge: 100,
+        maxAge: 1,
     });
 
     const cachedRepository = new CachedRepository(randomRepository, cache);
@@ -75,11 +63,13 @@ async function main(): Promise<void> {
 
     console.log(foo);
 
+    await new Promise(resolve => { setTimeout(resolve, 500); });
+
     const foo2 = await cachedRepository.get('foo');
 
     console.log(foo2);
 
-    await cachedRepository.delete('foo');
+    await new Promise(resolve => { setTimeout(resolve, 500); });
 
     const foo3 = await cachedRepository.get('foo');
 

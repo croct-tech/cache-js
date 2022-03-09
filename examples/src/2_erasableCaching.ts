@@ -1,4 +1,9 @@
-import {CacheLoader, CacheProvider, InMemoryCache} from '../../../src';
+import {
+    CacheLoader,
+    CacheProvider,
+    HoldWhileRevalidateCache,
+    InMemoryCache,
+} from '@croct-tech/cache';
 
 type Foo = {
     value: string,
@@ -7,8 +12,6 @@ type Foo = {
 
 interface FooRepository {
     get(id: string): Promise<Foo>;
-
-    set(id: string, value: Foo): Promise<void>;
 
     delete(id: string): Promise<void>;
 }
@@ -21,12 +24,6 @@ class RandomRepository implements FooRepository {
             value: id,
             accessTime: Date.now(),
         });
-    }
-
-    public set(id: string): Promise<void> {
-        console.log(`Setting ${id} on random repository`);
-
-        return Promise.resolve();
     }
 
     public delete(id: string): Promise<void> {
@@ -50,14 +47,7 @@ class CachedRepository implements FooRepository {
     }
 
     private get cacheLoader(): CacheLoader<string, Foo> {
-        return async key => {
-            const value = await this.repository.get(key);
-
-            // Manually cache value on cacheLoader
-            await this.cache.set(key, value);
-
-            return value;
-        };
+        return key => this.repository.get(key);
     }
 
     public get(id: string): Promise<Foo> {
@@ -66,17 +56,8 @@ class CachedRepository implements FooRepository {
         return this.cache.get(id, this.cacheLoader);
     }
 
-    public async set(id: string, value: Foo): Promise<void> {
-        console.log(`Setting ${id} on cached repository`);
-
-        await this.repository.set(id, value);
-
-        // Manually cache the new value
-        await this.cache.set(id, value);
-    }
-
     public async delete(id: string): Promise<void> {
-        console.log(`Deleting ${id} from random repository`);
+        console.log(`Deleting ${id} from cached repository`);
 
         await Promise.all([
             this.repository.delete(id),
@@ -88,7 +69,10 @@ class CachedRepository implements FooRepository {
 async function main(): Promise<void> {
     const randomRepository = new RandomRepository();
 
-    const cache = new InMemoryCache();
+    const cache = new HoldWhileRevalidateCache<string, Foo>({
+        cacheProvider: new InMemoryCache(),
+        maxAge: 100,
+    });
 
     const cachedRepository = new CachedRepository(randomRepository, cache);
 
@@ -100,10 +84,7 @@ async function main(): Promise<void> {
 
     console.log(foo2);
 
-    await cachedRepository.set('foo', {
-        value: 'bar',
-        accessTime: Date.now(),
-    });
+    await cachedRepository.delete('foo');
 
     const foo3 = await cachedRepository.get('foo');
 
