@@ -50,7 +50,7 @@ class Cached {
 }
 ```
 
-See an example of a cached repository [here](examples/src/1_simpleCaching.ts).
+See an example of a cached repository [here](examples/src/simpleCaching.ts).
 
 ## Methods
 
@@ -74,7 +74,7 @@ When and how the function is called is up to the cache implementation. It is als
 to automatically cache the loaded value or not, see [Implementations](#implementations) to know which ones
 do and do not auto-cache.
 
-See an example of a cached read-only repository [here](examples/src/1_simpleCaching.ts) using this method.
+See an example of a cached read-only repository [here](examples/src/simpleCaching.ts) using this method.
 
 ### DELETE
 
@@ -86,7 +86,7 @@ interface CacheProvider<K, V> extends CacheProvider<K, V> {
 
 The `delete` method accepts a key and removes the corresponding value from the cache.
 
-See an example of a cached repository [here](examples/src/2_erasableCaching.ts) using this method.
+See an example of a cached repository [here](examples/src/erasableCaching.ts) using this method.
 
 ### SET
 
@@ -103,7 +103,7 @@ Normally you won't need to use this method to cache a value on a read operation.
 to save the value automatically when it uses the loader. This way you can define the strategy for caching in the
 wiring of the application. You can also not wire an auto-save strategy and have the cache only return values cached manually.
 
-See an example of a manually cached repository [here](examples/src/3_manualCaching.ts) using this method.
+See an example of a manually cached repository [here](examples/src/manualCaching.ts) using this method.
 
 ## Implementations
 

@@ -32,7 +32,7 @@
     "build": "tsc -p tsconfig.build.json && cp package.json build/"
   },
   "dependencies": {
-    "@croct-tech/json": "^0.2",
+    "@croct/json": "^1.0",
     "@croct-tech/time": "^0.1",
     "object-hash": "^3.0.0"
   },

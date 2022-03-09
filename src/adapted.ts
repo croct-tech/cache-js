@@ -1,4 +1,4 @@
-import {JsonCompatible, JsonValue} from '@croct-tech/json';
+import {JsonCompatible, JsonValue} from '@croct/json';
 import * as hash from 'object-hash';
 import {CacheLoader, CacheProvider} from './cacheProvider';
 
