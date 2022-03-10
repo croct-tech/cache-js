@@ -135,13 +135,10 @@ Supports string keys and any data type for values.
 
 - [`PrefixedCache`](src/prefixed.ts): A cache wrapper that prefixes all keys with a string.
 - [`AdaptedCache`](src/adapted.ts): A cache wrapper that adapts a typed `CacheProvider<K, V>` into a 
-`CacheProvider<IK, IV>` by transforming keys and values.
-  
-Available transformers:
-
-  - `createHashSerializer`: Serializes any object into a hash. This is typically used to transform keys into strings.
-  - `jsonSerializer`: Serializes any object to a JSON string. This is a typed wrapper around `JSON.stringify`.
-  - `jsonDeserializer`: Deserializes a JSON string into a `JsonValue`. This is a typed wrapper around `JSON.parse`.
+`CacheProvider<IK, IV>` by transforming keys and values. Available transformers:
+     - `AdaptedCache.createHashSerializer`: Serializes any object into a hash. This is typically used to transform keys into strings.
+     - `AdaptedCache.jsonSerializer`: Serializes any object to a JSON string. This is a typed wrapper around `JSON.stringify`.
+     - `AdaptedCache.jsonDeserializer`: Deserializes a JSON string into a `JsonValue`. This is a typed wrapper around `JSON.parse`.
   
 ### Auto-caching strategy
 
