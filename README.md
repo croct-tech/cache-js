@@ -14,14 +14,15 @@
     <br />
     <br />
     <a href="https://github.com/croct-tech/cache-js/releases">📦Releases</a>
-        ·
-        <a href="https://github.com/croct-tech/cache-js/issues/new?labels=bug&template=bug-report.md">🐞Report Bug</a>
-        ·
-        <a href="https://github.com/croct-tech/cache-js/issues/new?labels=enhancement&template=feature-request.md">✨Request Feature</a>
+    ·
+    <a href="https://github.com/croct-tech/cache-js/issues/new?labels=bug&template=bug-report.md">🐞Report Bug</a>
+    ·
+    <a href="https://github.com/croct-tech/cache-js/issues/new?labels=enhancement&template=feature-request.md">✨Request Feature</a>
 </p>
 
 ## Installation
-Use the package manage [NPM](https://www.npmjs.com) to install the package:
+
+We recommend using [NPM](https://www.npmjs.com) to install the package:
 
 ```sh
 npm install @croct-tech/cache
@@ -29,118 +30,130 @@ npm install @croct-tech/cache
 
 ## Basic usage 
 
-The most common use case of this library is to decorate an implementation with a cache like so:
+The most common use case of this library is to decorate implementations with caching capabilities:
 
 ```ts
-import {CacheProvider} from './cacheProvider';
+import {CacheProvider} from '@croct/cache';
 
-type Parameter = { /* ... */ };
-type Result = { /* ... */ };
-
-class Cached {
-    private cache: CacheProvider<Parameter, Result>;
+class CachedService implements Service {
+    private cache: CacheProvider<string, object>;
     
-    private doSomethingInner(parameter: Parameter): Promise<Result> {
-      // Some expensive and/or slow operation
+    private service: Service;
+    
+    public constructor(service: Service) {
+        this.service = service;
+        this.cache = new CacheProvider();
     }
     
-    public async doSomething(parameter: Parameter): Promise<Result> {
-      return this.cache.get(parameter, this.doSomethingInner.bind(this));
+    public load(key: string): Promise<object> {
+        return this.cache.get(key, () => this.service.load(key));
     }
 }
 ```
-
-See an example of a cached repository [here](examples/src/simpleCaching.ts).
 
 ## Methods
 
-The cache API provided by this library defined as the interface `CacheProvider<K, V>`, where `K` is the
-type of the key used to identify the cached value, and `V` is the type of the value to be cached.
+The [`CacheProvider<K, V>`](src/cacheProvider.ts) interface is the main interface of this library. 
+The generic parameter `K` is the type of the key that identifies the cached value and `V` is the type 
+of the value to be cached.
 
-The interface provides the following methods:
+It defines the following methods:
 
-### GET
+### Get
 
-```ts
-type CacheLoader<K, V> = (key: K) => Promise<V>;
+The `get` method accepts a key and a loader function that's called to retrieve a new, fresh, value.
 
-interface CacheProvider<K, V> {
-  get(key: K, loader: CacheLoader<K, V>): Promise<V>;
-}
-```
-
-The `get` method accepts a key and a loader function that can be called to retrieve a new, fresh, value.
 When and how the function is called is up to the cache implementation. It is also up to the implementation
-to automatically cache the loaded value or not, see [Implementations](#implementations) to know which ones
-do and do not auto-cache.
+to automatically cache the loaded value or not, see [Implementations](#implementations) for more information
+about to know which implementations do and do not auto-cache.
 
-See an example of a cached read-only repository [here](examples/src/simpleCaching.ts) using this method.
-
-### DELETE
+The following example shows how to use the `get` method:
 
 ```ts
-interface CacheProvider<K, V> extends CacheProvider<K, V> {
-  delete(key: K): Promise<void>;
-}
+const cache = new InMemoryCache<string, number>();
+
+console.assert((await cache.get('key', () => 42)) === 42);
 ```
 
-The `delete` method accepts a key and removes the corresponding value from the cache.
+### Set
 
-See an example of a cached repository [here](examples/src/erasableCaching.ts) using this method.
+The `set` method accepts a key and a value and sets the corresponding value in the cache, overriding
+any previous entry present in the cache regardless of whether it was set manually or automatically.
 
-### SET
+Normally you won't need to use this method to cache a value on a read operation. Delegating the caching
+to the `get` method is the recommended way to achieve this. This way you can define the strategy for
+caching in the wiring of the application.
+
+The example below shows how to use the `set` method:
 
 ```ts
-interface CacheProvider<K, V> extends CacheProvider<K, V> {
-  set(key: K, value: V): Promise<void>;
-}
+const cache = new InMemoryCache<string, number|null>();
+
+await cache.set('key', 42);
+
+console.assert((await cache.get('key', () => null)) === 42);
+
+await cache.set('key', 43);
+
+console.assert((await cache.get('key', () => null)) === 43);
 ```
 
-The `set` method accepts a key and a value and sets the corresponding value in the cache,
-overriding any previous entry present in the cache regardless of whether it was set manually or automatically.
+### Delete
 
-Normally you won't need to use this method to cache a value on a read operation. You can count on the cache itself
-to save the value automatically when it uses the loader. This way you can define the strategy for caching in the
-wiring of the application. You can also not wire an auto-save strategy and have the cache only return values cached manually.
+The `delete` method takes a key and removes the corresponding value from the cache.
 
-See an example of a manually cached repository [here](examples/src/manualCaching.ts) using this method.
+Here's an example of how to delete a value from the cache:
+
+```ts
+const cache = new InMemoryCache<string, number|null>();
+
+await cache.set('key', 42);
+
+console.assert((await cache.get('key', () => null)) === 42);
+
+await cache.delete('key');
+
+console.assert((await cache.get('key', () => null)) === null);
+```
 
 ## Implementations
 
-This library provides implementations of:
-- Final cache providers backed by some data structure or service
-- Data and key manipulation wrappers
-- Auto-caching strategy implementations
+This library ships with a few `CacheProvider` implementations, including:
 
-### Final cache providers
+- Standalone providers
+- Adapters for key and value transformation
+- Auto-caching strategy
 
-- `NoopCache`: A no-op implementation that does nothing, it supports any data type for both keys and values.
-- `InMemoryCache`: A simple in-memory cache implementation, support string keys and any data type for values.
-- `RedisDataCache`: A cache implementation using Redis, support only string keys and values.  
-  Using this implementation requires the `ioredis` package to be installed.
+### Standalone providers
+
+- [`NoopCache`](src/noop.ts): A no-op implementation that does not cache anything, suitable for testing. 
+Supports any key and value type.
+- [`InMemoryCache`](src/inMemory.ts): A simple in-memory cache implementation.
+Supports string keys and any data type for values.
 
 ### Data and key manipulation
 
-- `PrefixedCache`: A cache wrapper that prefixes all keys with a string.
-- `AdaptedCache`: A cache wrapper that can adapt a typed `CacheProvider<K, V>` into a `CacheProvider<IK, IV>` by
-  transforming keys and values.
+- [`PrefixedCache`](src/prefixed.ts): A cache wrapper that prefixes all keys with a string.
+- [`AdaptedCache`](src/adapted.ts): A cache wrapper that adapts a typed `CacheProvider<K, V>` into a 
+`CacheProvider<IK, IV>` by transforming keys and values.
   
-  Transformers provided:
-  - `createHashSerializer`: Serializes any object into a hash, the hash may use an irreversible algorithm.
+Available transformers:
+
+  - `createHashSerializer`: Serializes any object into a hash. This is typically used to transform keys into strings.
   - `jsonSerializer`: Serializes any object to a JSON string. This is a typed wrapper around `JSON.stringify`.
   - `jsonDeserializer`: Deserializes a JSON string into a `JsonValue`. This is a typed wrapper around `JSON.parse`.
   
 ### Auto-caching strategy
 
-- `HoldWhileRevalidateCache`: A cache wrapper that automatically caches the result of a loader function for a set
-  expiration time. Once the cache expires, the next `get` call will wait until the result of the loader function is 
-  resolved.
-- `StaleWhileRevalidateCache`: A cache wrapper that automatically caches the result of a loader function for a set
-  expiration time. Once the cache expires, the next `get` call will still return the cached value and add a separate
-  background task in the event-loop calling the loader function and caching its result.
-
+- [`HoldWhileRevalidateCache`](src/holdWhileRevalidate.ts): A cache wrapper that automatically caches the result of a 
+loader function for the expiration period that you configure. Once the cache expires, subsequent calls to the `get`
+method will wait until the result of the loader function is resolved.
+- [`StaleWhileRevalidateCache`](src/staleWhitRevalidating.ts): A cache wrapper that automatically caches the result 
+of a loader function for the expiration period that you configure. Once the cache expires, the next `get` call will 
+still return the cached value while the loader function is being resolved in the background.
 
 ## Contributing
+
 Contributions to the package are always welcome! 
 
 - Report any bugs or issues on the [issue tracker](https://github.com/croct-tech/cache-js/issues).
