@@ -27,8 +27,6 @@
     "lint": "eslint 'src/**/*.ts'",
     "test": "jest -c jest.config.js --coverage",
     "validate": "tsc --noEmit",
-    "install:examples": "cd examples && npm install",
-    "validate:examples": "tsc --noEmit -p examples/tsconfig.json",
     "build": "tsc -p tsconfig.build.json && cp package.json build/"
   },
   "dependencies": {
