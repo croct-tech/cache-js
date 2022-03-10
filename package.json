@@ -1,7 +1,7 @@
 {
   "name": "@croct-tech/cache",
   "version": "0.0.0-dev",
-  "description": "An arbitrary data caching library.",
+  "description": "An abstraction layer for caching.",
   "author": {
     "name": "Croct",
     "email": "lib+cache-js@croct.com",
@@ -27,10 +27,10 @@
     "lint": "eslint 'src/**/*.ts'",
     "test": "jest -c jest.config.js --coverage",
     "validate": "tsc --noEmit",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json && cp package.json build/"
   },
   "dependencies": {
-    "@croct-tech/json": "^0.2",
+    "@croct/json": "^1.0",
     "@croct-tech/time": "^0.1",
     "object-hash": "^3.0.0"
   },
@@ -44,14 +44,6 @@
     "jest": "^27.5",
     "ts-jest": "^27.1",
     "typescript": "^4.5"
-  },
-  "peerDependencies": {
-    "ioredis": "^4.28.5"
-  },
-  "peerDependenciesMeta": {
-    "ioredis": {
-      "optional": true
-    }
   },
   "files": [
     "**/*.js",
