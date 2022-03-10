@@ -5,7 +5,7 @@
     <br />
     <strong>Cache</strong>
     <br />
-    An abstraction layer for caching.
+    An abstraction layer for caching strategies.
 </p>
 <p align="center">
     <img alt="Build" src="https://github.com/croct-tech/cache-js/actions/workflows/validate-branch.yaml/badge.svg" />
