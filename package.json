@@ -30,13 +30,12 @@
     "build": "tsc -p tsconfig.build.json && cp package.json build/"
   },
   "dependencies": {
-    "@croct/json": "^1.0",
     "@croct-tech/time": "^0.1",
+    "@croct/json": "^1.0",
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
     "@croct/eslint-plugin": "^0.1.1",
-    "@types/ioredis": "^4.28.8",
     "@types/jest": "^27.4",
     "@types/object-hash": "^2.2.1",
     "@typescript-eslint/parser": "^5.11",
