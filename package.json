@@ -1,7 +1,7 @@
 {
   "name": "@croct-tech/cache",
   "version": "0.0.0-dev",
-  "description": "An arbitrary data caching library.",
+  "description": "An abstraction layer for caching.",
   "author": {
     "name": "Croct",
     "email": "lib+cache-js@croct.com",

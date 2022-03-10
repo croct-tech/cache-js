@@ -3,9 +3,9 @@
         <img src="https://cdn.croct.io/brand/logo/repo-icon-green.svg" alt="Croct" height="80"/>
     </a>
     <br />
-    <strong>Caching library</strong>
+    <strong>Cache</strong>
     <br />
-    An arbitrary data caching library.
+    An abstraction layer for caching.
 </p>
 <p align="center">
     <img alt="Build" src="https://github.com/croct-tech/cache-js/actions/workflows/validate-branch.yaml/badge.svg" />
