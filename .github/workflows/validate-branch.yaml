@@ -68,12 +68,6 @@ jobs:
       - name: Check compilation errors
         run: npm run validate
 
-      - name: Check examples compilation errors
-        run: |
-          npm run build
-          npm run install:examples
-          npm run validate:examples
-
   check-code-style:
     runs-on: ubuntu-18.04
     steps:
