@@ -2,8 +2,6 @@ import {CacheLoader, CacheProvider} from './cacheProvider';
 
 /**
  * A cache provider that automatically caches loaded values.
- *
- * The cache is not automatically cleared.
  */
 export class AutoSaveCache<K, V> implements CacheProvider<K, V> {
     private readonly cacheProvider: CacheProvider<K, V>;
