@@ -143,7 +143,6 @@ Supports string keys and any data type for values.
 ### Auto-caching strategy
 
 - [`AutoSaveCache`](src/autoSave.ts): A cache wrapper that automatically caches the result of a loader function.
-  The cache is not automatically cleared.
 - [`HoldWhileRevalidateCache`](src/holdWhileRevalidate.ts): A cache wrapper that automatically caches the result of a 
 loader function for the expiration period that you configure. Once the cache expires, subsequent calls to the `get`
 method will wait until the result of the loader function is resolved.
