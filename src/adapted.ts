@@ -27,16 +27,11 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
 
     private readonly valueOutputTransformer: Transformer<IV, V>;
 
-    public constructor({
-        cache,
-        keyTransformer,
-        valueInputTransformer,
-        valueOutputTransformer,
-    }: Configuration<K, V, IK, IV>) {
-        this.cache = cache;
-        this.keyTransformer = keyTransformer;
-        this.valueInputTransformer = valueInputTransformer;
-        this.valueOutputTransformer = valueOutputTransformer;
+    public constructor(config: Configuration<K, V, IK, IV>) {
+        this.cache = config.cache;
+        this.keyTransformer = config.keyTransformer;
+        this.valueInputTransformer = config.valueInputTransformer;
+        this.valueOutputTransformer = config.valueOutputTransformer;
     }
 
     public static transformKeys<K, IK, V>(
@@ -65,10 +60,12 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
     }
 
     public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
-        return this.cache.get(
-            this.keyTransformer(key),
-            () => loader(key).then(this.valueInputTransformer),
-        ).then(this.valueOutputTransformer);
+        return this.cache
+            .get(
+                this.keyTransformer(key),
+                () => loader(key).then(this.valueInputTransformer),
+            )
+            .then(this.valueOutputTransformer);
     }
 
     public set(key: K, value: V): Promise<void> {
@@ -82,7 +79,9 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
         return this.cache.delete(this.keyTransformer(key));
     }
 
-    public static createHashSerializer(algorithm?: hash.Options['algorithm']): Transformer<any, string> {
+    public static createHashSerializer(
+        algorithm?: hash.Options['algorithm'],
+    ): Transformer<any, string> {
         const options: hash.Options = {
             encoding: 'base64',
             algorithm: algorithm,

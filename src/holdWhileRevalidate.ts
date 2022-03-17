@@ -12,10 +12,7 @@ export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
     private readonly maxAge: number;
 
-    public constructor({
-        cacheProvider,
-        maxAge,
-    }: Configuration<K, V>) {
+    public constructor({cacheProvider, maxAge}: Configuration<K, V>) {
         this.cacheProvider = cacheProvider;
         this.maxAge = maxAge;
     }

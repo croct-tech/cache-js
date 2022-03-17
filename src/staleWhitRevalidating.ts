@@ -19,14 +19,10 @@ export class StaleWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
     private readonly errorHandler: (error: Error) => void;
 
-    public constructor({
-        cacheProvider,
-        freshPeriod,
-        errorHandler = (): void => { /* noop */ },
-    }: Configuration<K, V>) {
-        this.cacheProvider = cacheProvider;
-        this.freshPeriod = freshPeriod;
-        this.errorHandler = errorHandler;
+    public constructor(config: Configuration<K, V>) {
+        this.cacheProvider = config.cacheProvider;
+        this.freshPeriod = config.freshPeriod;
+        this.errorHandler = config.errorHandler ?? ((): void => { /* noop */ });
     }
 
     public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {
