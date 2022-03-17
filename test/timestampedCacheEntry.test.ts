@@ -12,9 +12,9 @@ describe('A cache entry associated with a timestamp', () => {
             timestamp: Instant.parse('2015-08-31T12:34:56Z'),
         };
 
-        const jsonString = TimestampedCacheEntry.toJSON(entry);
+        const serializedEntry = TimestampedCacheEntry.toJSON(entry);
 
-        const parsedEntry = TimestampedCacheEntry.fromJSON(jsonString);
+        const parsedEntry = TimestampedCacheEntry.fromJSON(serializedEntry);
 
         expect(parsedEntry).toStrictEqual(entry);
     });
@@ -30,9 +30,9 @@ describe('A cache entry associated with a timestamp', () => {
         'an object without an invalid timestamp type': {value: 'foo', timestamp: 'bar'},
         'an object without an invalid timestamp value': {value: 'foo', timestamp: Number.MAX_VALUE},
     }))('should fail to parse %s', (_, data) => {
-        const jsonString = JSON.stringify(data);
+        const serializedJson = JSON.stringify(data);
 
-        expect(() => TimestampedCacheEntry.fromJSON(jsonString))
+        expect(() => TimestampedCacheEntry.fromJSON(serializedJson))
             .toThrow('Invalid JSON representation of TimestampedCacheEntry.');
     });
 });
