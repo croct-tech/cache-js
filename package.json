@@ -35,7 +35,7 @@
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
-    "@croct/eslint-plugin": "^0.3.0",
+    "@croct/eslint-plugin": "^0.6.0",
     "@types/jest": "^29.0.0",
     "@types/object-hash": "^2.2.1",
     "@typescript-eslint/parser": "^5.11",
