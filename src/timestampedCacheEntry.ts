@@ -24,7 +24,10 @@ export type TimestampedCacheEntry<T> = Readonly<{
 
 export namespace TimestampedCacheEntry {
     export function toJSON<T extends JsonCompatible>(entry: TimestampedCacheEntry<T>): string {
-        return JSON.stringify(entry);
+        return JSON.stringify({
+            value: entry.value,
+            timestamp: entry.timestamp.toEpochMillis(),
+        });
     }
 
     export function fromJSON<T extends JsonValue>(json: string): TimestampedCacheEntry<T> {
@@ -43,7 +46,7 @@ export namespace TimestampedCacheEntry {
 
         return {
             value: jsonEntry.value as T,
-            timestamp: Instant.fromEpochMillis(jsonEntry.timestamp),
+            timestamp: Instant.ofEpochMilli(jsonEntry.timestamp),
         };
     }
 }
