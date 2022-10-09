@@ -4,7 +4,7 @@ export * from './prefixed';
 export * from './adapted';
 export * from './autoSave';
 export * from './holdWhileRevalidate';
-export * from './staleWhitRevalidating';
+export * from './staleWhileRevalidate';
 export * from './timestampedCacheEntry';
 export * from './sharedInFlight';
 export {NoopCache} from './noop';
