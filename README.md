@@ -146,7 +146,7 @@ Supports string keys and any data type for values.
 - [`HoldWhileRevalidateCache`](src/holdWhileRevalidate.ts): A cache wrapper that automatically caches the result of a 
 loader function for the expiration period that you configure. Once the cache expires, subsequent calls to the `get`
 method will wait until the result of the loader function is resolved.
-- [`StaleWhileRevalidateCache`](src/staleWhitRevalidating.ts): A cache wrapper that automatically caches the result 
+- [`StaleWhileRevalidateCache`](src/staleWhileRevalidate.ts): A cache wrapper that automatically caches the result 
 of a loader function for the expiration period that you configure. Once the cache expires, the next `get` call will 
 still return the cached value while the loader function is being resolved in the background.
 
