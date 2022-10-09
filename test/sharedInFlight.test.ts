@@ -9,7 +9,7 @@ describe('A cache that shares in-flight requests', () => {
 
         const cache = new SharedInFlightCache(inner);
 
-        let resolveInner: (v: any) => void = jest.fn();
+        let resolveInner: (value: any) => void = jest.fn();
         const loaderOne = jest.fn().mockReturnValueOnce(new Promise(resolve => {
             resolveInner = resolve;
         }));
@@ -40,12 +40,12 @@ describe('A cache that shares in-flight requests', () => {
 
         const cache = new SharedInFlightCache(inner);
 
-        let resolveInnerOne: (v: any) => void = jest.fn();
+        let resolveInnerOne: (value: any) => void = jest.fn();
         const loaderOne = jest.fn().mockReturnValueOnce(new Promise(resolve => {
             resolveInnerOne = resolve;
         }));
 
-        let resolveInnerTwo: (v: any) => void = jest.fn();
+        let resolveInnerTwo: (value: any) => void = jest.fn();
         const loaderTwo = jest.fn().mockReturnValueOnce(new Promise(resolve => {
             resolveInnerTwo = resolve;
         }));

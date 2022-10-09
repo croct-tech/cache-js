@@ -9,36 +9,36 @@ import {CacheLoader, CacheProvider} from './cacheProvider';
  *   for IO, a caller 2 requests the entry for the same key A.
  * - This cache will return a reference to the same Promise returned to caller 1.
  *
- * Wrapping a cache with a SharedInFlightCache ensures that the same entry
- * is not created twice. On the example above, if the entry was not present in
+ * Wrapping a cache with a `SharedInFlightCache` ensures that the same entry
+ * is not created twice. In the example above, if the entry was not present in
  * the cache the loader would be called twice and, if the cache auto-saves,
  * the cache entry would also be written twice.
- * With this wrapper, the loaders would only be called once and the entry,
- * if saved, would also be saved once.
+ * With this wrapper, the loaders would only be called once, and the entry
+ * would also be saved once, if the cache auto-saves.
  */
 export class SharedInFlightCache<T> implements CacheProvider<string, T> {
     private readonly inner: CacheProvider<string, T>;
 
-    private readonly inFlight = new Map<string, Promise<T>>();
+    private readonly pending = new Map<string, Promise<T>>();
 
     public constructor(inner: CacheProvider<string, T>) {
         this.inner = inner;
     }
 
     public get(key: string, loader: CacheLoader<string, T>): Promise<T> {
-        const inFlight = this.inFlight.get(key);
+        const pending = this.pending.get(key);
 
-        if (inFlight !== undefined) {
-            return inFlight;
+        if (pending !== undefined) {
+            return pending;
         }
 
-        const newPromise = this.inner
+        const promise = this.inner
             .get(key, loader)
-            .finally(() => this.inFlight.delete(key));
+            .finally(() => this.pending.delete(key));
 
-        this.inFlight.set(key, newPromise);
+        this.pending.set(key, promise);
 
-        return newPromise;
+        return promise;
     }
 
     public set(key: string, value: T): Promise<void> {
