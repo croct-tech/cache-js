@@ -3,6 +3,7 @@ require('@rushstack/eslint-patch/modern-module-resolution');
 
 module.exports = {
     extends: ['plugin:@croct/typescript'],
+    root: true,
     plugins: ['@croct'],
     parserOptions: {
         project: ['./tsconfig.json'],
