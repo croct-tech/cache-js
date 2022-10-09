@@ -9,7 +9,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
     };
 
     it('should hold while saving a non-cached value', async () => {
-        const now = Instant.fromEpochMillis(12345);
+        const now = Instant.ofEpochMilli(12345);
 
         mockCache.get.mockImplementation((key, loader) => loader(key));
         mockCache.set.mockResolvedValue();
@@ -38,7 +38,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
     });
 
     it('should return the stale value while revalidating expired entries', async () => {
-        const now = Instant.fromEpochMillis(12345);
+        const now = Instant.ofEpochMilli(12345);
 
         const cachedEntry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
@@ -90,7 +90,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
     });
 
     it('should returned non-expired entries', async () => {
-        const now = Instant.fromEpochMillis(12345);
+        const now = Instant.ofEpochMilli(12345);
 
         const entry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
@@ -118,7 +118,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
     it('should set entries with the current time', async () => {
         mockCache.set.mockResolvedValue();
 
-        const now = Instant.fromEpochMillis(12345);
+        const now = Instant.ofEpochMilli(12345);
 
         jest.spyOn(Instant, 'now').mockReturnValue(now);
 
