@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/croct-tech/cache-js",
   "scripts": {
-    "lint": "eslint 'src/**/*.ts'",
+    "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
     "test": "jest -c jest.config.js --coverage",
     "validate": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json && cp package.json build/"
