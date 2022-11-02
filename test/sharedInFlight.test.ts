@@ -24,13 +24,13 @@ describe('A cache that shares in-flight requests', () => {
         await expect(promiseOne).resolves.toStrictEqual('some-value');
         await expect(promiseTwo).resolves.toStrictEqual('some-value');
 
-        expect(inner.get).toBeCalledWith('key', loaderOne);
-        expect(inner.get).toBeCalledTimes(1);
+        expect(inner.get).toHaveBeenCalledWith('key', loaderOne);
+        expect(inner.get).toHaveBeenCalledTimes(1);
 
-        expect(loaderOne).toBeCalledWith('key');
-        expect(loaderOne).toBeCalledTimes(1);
+        expect(loaderOne).toHaveBeenCalledWith('key');
+        expect(loaderOne).toHaveBeenCalledTimes(1);
 
-        expect(loaderTwo).not.toBeCalled();
+        expect(loaderTwo).not.toHaveBeenCalled();
     });
 
     it('should not share in-flight get requests between different keys', async () => {
@@ -59,15 +59,15 @@ describe('A cache that shares in-flight requests', () => {
         await expect(promiseOne).resolves.toStrictEqual('value-one');
         await expect(promiseTwo).resolves.toStrictEqual('value-two');
 
-        expect(inner.get).toBeCalledWith('key-one', loaderOne);
-        expect(inner.get).toBeCalledWith('key-two', loaderTwo);
-        expect(inner.get).toBeCalledTimes(2);
+        expect(inner.get).toHaveBeenCalledWith('key-one', loaderOne);
+        expect(inner.get).toHaveBeenCalledWith('key-two', loaderTwo);
+        expect(inner.get).toHaveBeenCalledTimes(2);
 
-        expect(loaderOne).toBeCalledWith('key-one');
-        expect(loaderOne).toBeCalledTimes(1);
+        expect(loaderOne).toHaveBeenCalledWith('key-one');
+        expect(loaderOne).toHaveBeenCalledTimes(1);
 
-        expect(loaderTwo).toBeCalledWith('key-two');
-        expect(loaderTwo).toBeCalledTimes(1);
+        expect(loaderTwo).toHaveBeenCalledWith('key-two');
+        expect(loaderTwo).toHaveBeenCalledTimes(1);
     });
 
     it('should not share get requests after completion', async () => {
@@ -90,15 +90,15 @@ describe('A cache that shares in-flight requests', () => {
 
         await expect(promiseTwo).resolves.toStrictEqual('value-two');
 
-        expect(inner.get).toBeCalledWith('key', loaderOne);
-        expect(inner.get).toBeCalledWith('key', loaderTwo);
-        expect(inner.get).toBeCalledTimes(2);
+        expect(inner.get).toHaveBeenCalledWith('key', loaderOne);
+        expect(inner.get).toHaveBeenCalledWith('key', loaderTwo);
+        expect(inner.get).toHaveBeenCalledTimes(2);
 
-        expect(loaderOne).toBeCalledWith('key');
-        expect(loaderOne).toBeCalledTimes(1);
+        expect(loaderOne).toHaveBeenCalledWith('key');
+        expect(loaderOne).toHaveBeenCalledTimes(1);
 
-        expect(loaderTwo).toBeCalledWith('key');
-        expect(loaderTwo).toBeCalledTimes(1);
+        expect(loaderTwo).toHaveBeenCalledWith('key');
+        expect(loaderTwo).toHaveBeenCalledTimes(1);
     });
 
     it('should forward set calls to the inner cache', async () => {
@@ -110,7 +110,7 @@ describe('A cache that shares in-flight requests', () => {
 
         await cache.set('some-key', 'some-value');
 
-        expect(inner.set).toBeCalledWith('some-key', 'some-value');
+        expect(inner.set).toHaveBeenCalledWith('some-key', 'some-value');
     });
 
     it('should forward delete calls to the inner cache', async () => {
@@ -122,6 +122,6 @@ describe('A cache that shares in-flight requests', () => {
 
         await cache.delete('some-key');
 
-        expect(inner.delete).toBeCalledWith('some-key');
+        expect(inner.delete).toHaveBeenCalledWith('some-key');
     });
 });
