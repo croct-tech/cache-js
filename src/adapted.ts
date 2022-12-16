@@ -4,6 +4,8 @@ import {CacheLoader, CacheProvider} from './cacheProvider';
 
 export type Transformer<D, S> = (value: D) => S;
 
+export type SerializationAlgorithm = 'passthrough' | 'md5' | 'sha1';
+
 type Configuration<K, V, IK, IV> = {
     cache: CacheProvider<IK, IV>,
     keyTransformer: Transformer<K, IK>,
@@ -79,9 +81,7 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
         return this.cache.delete(this.keyTransformer(key));
     }
 
-    public static createHashSerializer(
-        algorithm?: hash.Options['algorithm'],
-    ): Transformer<any, string> {
+    public static createHashSerializer(algorithm?: SerializationAlgorithm): Transformer<any, string> {
         const options: hash.Options = {
             encoding: 'base64',
             algorithm: algorithm,
