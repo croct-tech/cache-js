@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@croct-tech/time": "^0.6.0",
-    "@croct/json": "^1.0",
+    "@croct/json": "^2.0.0",
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
