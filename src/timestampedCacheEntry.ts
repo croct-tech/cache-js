@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-redeclare --
- * Declaration merge between a `type` and a `namespace` is safe.
- */
-
 import {Instant} from '@croct-tech/time';
 import {JsonCompatible, JsonValue} from '@croct/json';
 
