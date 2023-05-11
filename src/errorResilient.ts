@@ -9,7 +9,7 @@ type CacheErrorLog = Log<{
 /**
  * A cache wrapper that prevents any error from propagating to the caller.
  *
- * Errors retrieving values from the cache will behave as a cache miss.
+ * Errors retrieving values from the cache behave as a cache miss.
  */
 export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
     private readonly cache: CacheProvider<K, V>;
