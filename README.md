@@ -122,7 +122,8 @@ This library ships with a few `CacheProvider` implementations, including:
 
 - Standalone providers
 - Adapters for key and value transformation
-- Auto-caching strategy
+- Auto-caching strategies
+- Behavior strategies
 
 ### Standalone providers
 
@@ -150,6 +151,10 @@ method will wait until the result of the loader function is resolved.
 of a loader function for the expiration period that you configure. Once the cache expires, the next `get` call will 
 still return the cached value while the loader function is being resolved in the background.
 - [`SharedInFlightCache`](src/sharedInFlight.ts): A cache that ensures there is no concurrent get requests for a key to the underlying cache.
+
+### Behavior strategies
+
+- [`ErrorResilientCache`](src/errorResilient.ts): A cache wrapper that suppresses and logs errors from the underlying cache. Consumers can then assume that the cache never fails.
 
 ## Contributing
 

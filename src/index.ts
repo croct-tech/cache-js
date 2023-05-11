@@ -6,5 +6,6 @@ export * from './autoSave';
 export * from './holdWhileRevalidate';
 export * from './staleWhileRevalidate';
 export * from './timestampedCacheEntry';
+export * from './errorResilient';
 export * from './sharedInFlight';
 export {NoopCache} from './noop';
