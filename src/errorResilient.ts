@@ -7,7 +7,7 @@ type CacheErrorLog = Log<{
 }>;
 
 /**
- * A cache wrapper that stops any error from propagating to the caller.
+ * A cache wrapper that prevents any error from propagating to the caller.
  *
  * Errors retrieving values from the cache will behave as a cache miss.
  */

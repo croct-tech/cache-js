@@ -154,7 +154,7 @@ still return the cached value while the loader function is being resolved in the
 
 ### Behavior strategies
 
-- [`ErrorResilientCache`](src/errorResilient.ts): A cache wrapper that suppress and logs errors from the underlying cache. Consumers can then assume that the cache never fails.
+- [`ErrorResilientCache`](src/errorResilient.ts): A cache wrapper that suppresses and logs errors from the underlying cache. Consumers can then assume that the cache never fails.
 
 ## Contributing
 

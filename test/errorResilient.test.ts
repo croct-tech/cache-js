@@ -15,7 +15,7 @@ class FailingCache implements CacheProvider<any, any> {
     }
 }
 
-describe('An error resilient cache wrapper', () => {
+describe('An error-resilient cache wrapper', () => {
     it('should forward get calls', async () => {
         const innerCache = new InMemoryCache();
         const logger = new InMemoryLogger();
