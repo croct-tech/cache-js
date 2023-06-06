@@ -6,6 +6,12 @@ type CacheErrorLog = Log<{
     errorStack?: string,
 }>;
 
+/**
+ * A wrapper that indicates the wrapped error originated on the fresh data loader.
+ *
+ * This allows the error handling logic to differentiate an error that originated on the
+ * wrapped cache provider from an error that originated from the caller-provider data loader.
+ */
 class LoaderError extends Error {
     public readonly internal: unknown;
 
