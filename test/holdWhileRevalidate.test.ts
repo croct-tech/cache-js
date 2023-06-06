@@ -1,4 +1,5 @@
-import {Instant} from '@croct-tech/time';
+import {Instant, TimeZone} from '@croct-tech/time';
+import {FixedClock} from '@croct-tech/time/clock/fixedClock';
 import {CacheProvider, HoldWhileRevalidateCache, TimestampedCacheEntry} from '../src';
 
 describe('A cache provider that holds while revalidating the cache', () => {
@@ -10,16 +11,16 @@ describe('A cache provider that holds while revalidating the cache', () => {
 
     it('should hold while saving a non-cached value', async () => {
         const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         mockCache.get.mockImplementation((key, loader) => loader(key));
         mockCache.set.mockResolvedValue();
-
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
 
         const loader = jest.fn().mockResolvedValue('loaderValue');
 
         const cache = new HoldWhileRevalidateCache({
             cacheProvider: mockCache,
+            clock: clock,
             maxAge: 10,
         });
 
@@ -39,6 +40,7 @@ describe('A cache provider that holds while revalidating the cache', () => {
 
     it('should hold while saving over an expired value', async () => {
         const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         const cachedEntry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
@@ -48,12 +50,11 @@ describe('A cache provider that holds while revalidating the cache', () => {
         mockCache.get.mockResolvedValue(cachedEntry);
         mockCache.set.mockResolvedValue();
 
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
-
         const loader = jest.fn().mockResolvedValue('loaderValue');
 
         const cache = new HoldWhileRevalidateCache({
             cacheProvider: mockCache,
+            clock: clock,
             maxAge: 10,
         });
 
@@ -73,6 +74,7 @@ describe('A cache provider that holds while revalidating the cache', () => {
 
     it('should return the non-expired cached value', async () => {
         const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         const entry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
@@ -81,12 +83,11 @@ describe('A cache provider that holds while revalidating the cache', () => {
 
         mockCache.get.mockResolvedValue(entry);
 
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
-
         const loader = jest.fn();
 
         const cache = new HoldWhileRevalidateCache({
             cacheProvider: mockCache,
+            clock: clock,
             maxAge: 10,
         });
 
@@ -101,12 +102,12 @@ describe('A cache provider that holds while revalidating the cache', () => {
         mockCache.set.mockResolvedValue();
 
         const now = Instant.ofEpochMilli(12345);
-
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         const cache = new HoldWhileRevalidateCache({
             cacheProvider: mockCache,
             maxAge: 10,
+            clock: clock,
         });
 
         await cache.set('key', 'value');

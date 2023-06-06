@@ -1,4 +1,5 @@
-import {Instant} from '@croct-tech/time';
+import {Instant, TimeZone} from '@croct-tech/time';
+import {FixedClock} from '@croct-tech/time/clock/fixedClock';
 import {CacheProvider, StaleWhileRevalidateCache, TimestampedCacheEntry} from '../src';
 
 describe('A cache provider that uses stale values while revalidating the cache', () => {
@@ -10,17 +11,17 @@ describe('A cache provider that uses stale values while revalidating the cache',
 
     it('should hold while saving a non-cached value', async () => {
         const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         mockCache.get.mockImplementation((key, loader) => loader(key));
         mockCache.set.mockResolvedValue();
-
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
 
         const loader = jest.fn().mockResolvedValue('loaderValue');
 
         const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
+            clock: clock,
         });
 
         await expect(cache.get('key', loader)).resolves.toBe('loaderValue');
@@ -39,6 +40,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
 
     it('should return the stale value while revalidating expired entries', async () => {
         const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         const cachedEntry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
@@ -56,8 +58,6 @@ describe('A cache provider that uses stale values while revalidating the cache',
             return setPromise;
         });
 
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
-
         let resolveloader: (value: string) => any = jest.fn();
 
         const loader = jest.fn().mockReturnValueOnce(
@@ -67,6 +67,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
         const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
+            clock: clock,
         });
 
         await expect(cache.get('key', loader)).resolves.toBe('cachedValue');
@@ -91,6 +92,7 @@ describe('A cache provider that uses stale values while revalidating the cache',
 
     it('should returned non-expired entries', async () => {
         const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         const entry: TimestampedCacheEntry<string> = {
             value: 'cachedValue',
@@ -99,13 +101,12 @@ describe('A cache provider that uses stale values while revalidating the cache',
 
         mockCache.get.mockResolvedValue(entry);
 
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
-
         const loader = jest.fn();
 
         const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
+            clock: clock,
         });
 
         await expect(cache.get('key', loader)).resolves.toBe('cachedValue');
@@ -119,12 +120,12 @@ describe('A cache provider that uses stale values while revalidating the cache',
         mockCache.set.mockResolvedValue();
 
         const now = Instant.ofEpochMilli(12345);
-
-        jest.spyOn(Instant, 'now').mockReturnValue(now);
+        const clock = FixedClock.of(now, TimeZone.UTC);
 
         const cache = new StaleWhileRevalidateCache({
             cacheProvider: mockCache,
             freshPeriod: 10,
+            clock: clock,
         });
 
         await cache.set('key', 'value');

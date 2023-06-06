@@ -1,10 +1,12 @@
-import {Instant} from '@croct-tech/time';
+import {Clock, Instant} from '@croct-tech/time';
+import {DefaultClockProvider} from '@croct-tech/time/defaultClockProvider';
 import {CacheLoader, CacheProvider} from './cacheProvider';
 import {TimestampedCacheEntry} from './timestampedCacheEntry';
 
 type Configuration<K, V> = {
     cacheProvider: CacheProvider<K, TimestampedCacheEntry<V>>,
     maxAge: number,
+    clock?: Clock,
 };
 
 export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
@@ -12,13 +14,16 @@ export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
     private readonly maxAge: number;
 
-    public constructor({cacheProvider, maxAge}: Configuration<K, V>) {
+    private readonly clock: Clock;
+
+    public constructor({cacheProvider, maxAge, clock}: Configuration<K, V>) {
         this.cacheProvider = cacheProvider;
         this.maxAge = maxAge;
+        this.clock = clock ?? DefaultClockProvider.getClock();
     }
 
     public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {
-        const now = Instant.now();
+        const now = Instant.now(this.clock);
 
         const retrieveAndSave = async (): Promise<TimestampedCacheEntry<V>> => {
             const entry: TimestampedCacheEntry<V> = {
@@ -45,7 +50,7 @@ export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
     public set(key: K, value: V): Promise<void> {
         return this.cacheProvider.set(key, {
             value: value,
-            timestamp: Instant.now(),
+            timestamp: Instant.now(this.clock),
         });
     }
 
