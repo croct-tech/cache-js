@@ -6,10 +6,20 @@ type CacheErrorLog = Log<{
     errorStack?: string,
 }>;
 
+class LoaderError extends Error {
+    public readonly internal: unknown;
+
+    public constructor(internal: unknown) {
+        super('Loader error.');
+        this.internal = internal;
+    }
+}
+
 /**
- * A cache wrapper that prevents any error from propagating to the caller.
+ * A cache wrapper that prevents any error from the wrapped cache from propagating to the caller.
  *
  * Errors retrieving values from the cache behave as a cache miss.
+ * Errors retrieving a fresh value from the loader are propagated unchanged.
  */
 export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
     private readonly cache: CacheProvider<K, V>;
@@ -20,14 +30,26 @@ export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
         this.cache = cache;
         this.logger = logger;
 
-        this.logError = this.logError.bind(this);
+        this.logProviderError = this.logProviderError.bind(this);
     }
 
     public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         return this.cache
-            .get(key, loader)
+            .get(key, async loaderKey => {
+                try {
+                    return await loader(loaderKey);
+                } catch (error) {
+                    throw new LoaderError(error);
+                }
+            })
             .catch(error => {
-                this.logError(error);
+                if (error instanceof LoaderError) {
+                    this.logLoaderError(error.internal);
+
+                    throw error.internal;
+                }
+
+                this.logProviderError(error);
 
                 return loader(key);
             });
@@ -36,16 +58,27 @@ export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
     public set(key: K, value: V): Promise<void> {
         return this.cache
             .set(key, value)
-            .catch(this.logError);
+            .catch(this.logProviderError);
     }
 
     public delete(key: K): Promise<void> {
         return this.cache
             .delete(key)
-            .catch(this.logError);
+            .catch(this.logProviderError);
     }
 
-    private logError(error: unknown): void {
+    private logLoaderError(error: unknown): void {
+        this.logger.log({
+            level: LogLevel.ERROR,
+            message: 'Error detected on cache loader error.',
+            details: {
+                errorMessage: extractErrorMessage(error),
+                errorStack: error instanceof Error ? error.stack : undefined,
+            },
+        });
+    }
+
+    private logProviderError(error: unknown): void {
         this.logger.log({
             level: LogLevel.ERROR,
             message: 'Suppressed error on cache operation',
