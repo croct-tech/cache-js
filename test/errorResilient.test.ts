@@ -1,5 +1,5 @@
 import {InMemoryLogger, Log, LogLevel} from '@croct/logging';
-import {CacheProvider, ErrorResilientCache, InMemoryCache} from '../src';
+import {CacheProvider, ErrorResilientCache, InMemoryCache, NoopCache} from '../src';
 
 class FailingCache implements CacheProvider<any, any> {
     public delete(): Promise<void> {
@@ -54,6 +54,33 @@ describe('An error-resilient cache wrapper', () => {
         await expect(innerCache.get('foo', () => Promise.resolve(null))).resolves.toBeNull();
 
         expect(logger.getLogs()).toStrictEqual([]);
+    });
+
+    it('should forward loader errors unchanged', async () => {
+        const innerCache = new NoopCache();
+        const logger = new InMemoryLogger();
+        const cache = new ErrorResilientCache(innerCache, logger);
+
+        const loaderError = new Error('Some error message from loader.');
+        const loader = jest.fn()
+            .mockRejectedValueOnce(loaderError)
+            .mockRejectedValue(new Error('Incorrect error.'));
+
+        await expect(cache.get('foo', loader)).rejects.toBe(loaderError);
+
+        // The loader should only be called once
+        expect(loader).toHaveBeenCalledTimes(1);
+
+        expect(logger.getLogs()).toStrictEqual<Log[]>([
+            {
+                level: LogLevel.ERROR,
+                message: 'Error detected on cache loader.',
+                details: {
+                    errorMessage: loaderError.message,
+                    errorStack: loaderError.stack,
+                },
+            },
+        ]);
     });
 
     it('should handle errors on get calls as a cache miss', async () => {
