@@ -74,7 +74,7 @@ describe('An error-resilient cache wrapper', () => {
         expect(logger.getLogs()).toStrictEqual<Log[]>([
             {
                 level: LogLevel.ERROR,
-                message: 'Error detected on cache loader error.',
+                message: 'Error detected on cache loader.',
                 details: {
                     errorMessage: loaderError.message,
                     errorStack: loaderError.stack,

@@ -76,7 +76,7 @@ export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
     private logLoaderError(error: unknown): void {
         this.logger.log({
             level: LogLevel.ERROR,
-            message: 'Error detected on cache loader error.',
+            message: 'Error detected on cache loader.',
             details: {
                 errorMessage: extractErrorMessage(error),
                 errorStack: error instanceof Error ? error.stack : undefined,
