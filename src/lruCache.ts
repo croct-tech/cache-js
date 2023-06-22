@@ -1,5 +1,8 @@
 import {CacheProvider} from './cacheProvider';
 
+/**
+ * In-memory Least Recently Used cache.
+ */
 export class LruCache<T = any> implements CacheProvider<string, T> {
     private cache = new Map<string, T>();
 
@@ -9,6 +12,12 @@ export class LruCache<T = any> implements CacheProvider<string, T> {
         this.maxSize = maxSize;
     }
 
+    /**
+     * Creates a new LRU cache with the given maximum size.
+     *
+     * @param {number} maxSize The maximum number of entries in the cache. Must be a
+     *      positive safe integer.
+     */
     public static ofMaxSize(maxSize: number): LruCache {
         if (!Number.isSafeInteger(maxSize) || maxSize < 1) {
             throw new Error('LRU max size must be a positive safe integer.');
