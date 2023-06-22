@@ -128,9 +128,11 @@ This library ships with a few `CacheProvider` implementations, including:
 ### Standalone providers
 
 - [`NoopCache`](src/noop.ts): A no-op implementation that does not cache anything, suitable for testing. 
-Supports any key and value type.
+  Supports any key and value type.
 - [`InMemoryCache`](src/inMemory.ts): A simple in-memory cache implementation.
-Supports string keys and any data type for values.
+  Supports string keys and any data type for values.
+- [`LruCache`](src/lruCache.ts): An in-memory Least Recently Used (LRU) cache implementation.
+  Like the simple in-memory cache, supports string keys and any data type for values.
 
 ### Data and key manipulation
 
