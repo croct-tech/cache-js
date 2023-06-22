@@ -53,7 +53,7 @@ export class LruCache<T = any> implements CacheProvider<string, T> {
 
         return Promise.resolve();
     }
-   
+
     private prune(): void {
         while (this.cache.size > this.capacity) {
             const leastRecentlyUsedKey = this.cache
