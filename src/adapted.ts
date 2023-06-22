@@ -1,10 +1,29 @@
 import {JsonCompatible, JsonValue} from '@croct/json';
-import * as hash from 'object-hash';
+import {hasher, HasherOptions} from 'node-object-hash';
 import {CacheLoader, CacheProvider} from './cacheProvider';
 
 export type Transformer<D, S> = (value: D) => S;
 
 export type HashAlgorithm = 'passthrough' | 'md5' | 'sha1';
+
+const HASHER = hasher({
+    // Support classes and instances like `ResourceId`
+    coerce: true,
+
+    // Do not differentiate Objects, Sets and Maps constructed in different order
+    // `new Set([1,2,3])` should match `new Set([3,2,1])`
+    sort: {
+        array: false,
+        typedArray: false,
+        object: true,
+        set: true,
+        map: true,
+        bigint: true,
+    },
+
+    // Do not trim values, "foo " and "foo" should not match as the same key
+    trim: false,
+});
 
 type Configuration<K, V, IK, IV> = {
     cache: CacheProvider<IK, IV>,
@@ -82,12 +101,17 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
     }
 
     public static createHashSerializer(algorithm?: HashAlgorithm): Transformer<any, string> {
-        const options: hash.Options = {
-            encoding: 'base64',
-            algorithm: algorithm,
+        if (algorithm === 'passthrough') {
+            // Do not hash when algorithm is set to `passthrough`
+            return HASHER.sort.bind(HASHER);
+        }
+
+        const options: HasherOptions = {
+            enc: 'base64',
+            alg: algorithm,
         };
 
-        return (value: any): string => hash(value, options);
+        return (value: any): string => HASHER.hash(value, options);
     }
 
     /**

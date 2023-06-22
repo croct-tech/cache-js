@@ -114,6 +114,33 @@ describe('A cache adapter that can transform keys and values', () => {
         expect(mockCache.set).toHaveBeenCalledWith('key', 'transformed');
     });
 
+    it('should transform a value into a hash-able string', () => {
+        const transformer = AdaptedCache.createHashSerializer('passthrough');
+
+        const value = {
+            some: {
+                deeply: {
+                    nested: [
+                        'value',
+                    ],
+                },
+            },
+            with: 1,
+            multiple: true,
+            keys: null,
+            andTypes: [
+                'string',
+                1,
+                true,
+                null,
+            ],
+        };
+
+        const result = transformer(value);
+
+        expect(result).toBe('{andTypes:[string,1,1,],keys:,multiple:1,some:{deeply:{nested:[value]}},with:1}');
+    });
+
     it('should transform a value into a hash', () => {
         const transformer = AdaptedCache.createHashSerializer('md5');
 
@@ -138,7 +165,7 @@ describe('A cache adapter that can transform keys and values', () => {
 
         const result = transformer(value);
 
-        expect(result).toBe('DB8pVafUNdepTqZc8eE5qw==');
+        expect(result).toBe('oDA+C/1fqcOT90c6vwhaWg==');
     });
 
     it('should transform a value into its JSON representation', () => {
