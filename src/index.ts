@@ -1,5 +1,6 @@
 export * from './cacheProvider';
 export * from './inMemory';
+export * from './lruCache';
 export * from './prefixed';
 export * from './adapted';
 export * from './autoSave';
