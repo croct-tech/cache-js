@@ -1,7 +1,7 @@
 import {CacheProvider} from './cacheProvider';
 
 /**
- * In-memory Least Recently Used cache.
+ * In-memory Least Recently Used (LRU) cache.
  */
 export class LruCache<T = any> implements CacheProvider<string, T> {
     private cache = new Map<string, T>();
@@ -13,7 +13,7 @@ export class LruCache<T = any> implements CacheProvider<string, T> {
     }
 
     /**
-     * Creates a new LRU cache with the given maximum size.
+     * Initializes a new instance with the given capacity.
      *
      * @param {number} capacity The maximum number of entries in the cache. Must be a
      *      positive safe integer.
@@ -43,13 +43,7 @@ export class LruCache<T = any> implements CacheProvider<string, T> {
     public set(key: string, value: T): Promise<void> {
         this.cache.set(key, value);
 
-        while (this.cache.size > this.capacity) {
-            const leastRecentlyUsedKey = this.cache
-                .keys()
-                .next();
-
-            this.cache.delete(leastRecentlyUsedKey.value);
-        }
+        this.prune();
 
         return Promise.resolve();
     }
@@ -58,5 +52,15 @@ export class LruCache<T = any> implements CacheProvider<string, T> {
         this.cache.delete(key);
 
         return Promise.resolve();
+    }
+   
+    private prune(): void {
+        while (this.cache.size > this.capacity) {
+            const leastRecentlyUsedKey = this.cache
+                .keys()
+                .next();
+
+            this.cache.delete(leastRecentlyUsedKey.value);
+        }
     }
 }

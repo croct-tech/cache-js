@@ -1,12 +1,12 @@
 import {LruCache} from '../src';
 
 describe('A cache backed by an in-memory hash map', () => {
-    it('should reject non integer capacities', () => {
+    it('should reject non-integer capacities', () => {
         expect(() => LruCache.ofCapacity(2.5))
             .toThrow('LRU capacity must be a positive safe integer');
     });
 
-    it('should reject non positive capacities', () => {
+    it('should reject non-positive capacities', () => {
         expect(() => LruCache.ofCapacity(0))
             .toThrow('LRU capacity must be a positive safe integer');
 
