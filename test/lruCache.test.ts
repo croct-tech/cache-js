@@ -1,8 +1,21 @@
 import {LruCache} from '../src';
 
 describe('A cache backed by an in-memory hash map', () => {
+    it('should reject non integer capacities', () => {
+        expect(() => LruCache.ofCapacity(2.5))
+            .toThrow('LRU capacity must be a positive safe integer');
+    });
+
+    it('should reject non positive capacities', () => {
+        expect(() => LruCache.ofCapacity(0))
+            .toThrow('LRU capacity must be a positive safe integer');
+
+        expect(() => LruCache.ofCapacity(-1))
+            .toThrow('LRU capacity must be a positive safe integer');
+    });
+
     it('should load and return a fresh value when the key is not found', async () => {
-        const cache = LruCache.ofMaxSize(2);
+        const cache = LruCache.ofCapacity(2);
 
         const loader = jest.fn().mockResolvedValue('loaderValue');
 
@@ -13,7 +26,7 @@ describe('A cache backed by an in-memory hash map', () => {
     });
 
     it('should return cached values', async () => {
-        const cache = LruCache.ofMaxSize(2);
+        const cache = LruCache.ofCapacity(2);
 
         await cache.set('key', 'value');
 
@@ -25,7 +38,7 @@ describe('A cache backed by an in-memory hash map', () => {
     });
 
     it('should remove least recently used value from the cache', async () => {
-        const cache = LruCache.ofMaxSize(2);
+        const cache = LruCache.ofCapacity(2);
 
         const loader = jest.fn().mockResolvedValue('value-loader');
 
@@ -47,13 +60,13 @@ describe('A cache backed by an in-memory hash map', () => {
     });
 
     it('should not fail when deleting an unknown key', async () => {
-        const cache = LruCache.ofMaxSize(2);
+        const cache = LruCache.ofCapacity(2);
 
         await expect(cache.delete('unknown')).resolves.toBeUndefined();
     });
 
     it('should delete previously stored values', async () => {
-        const cache = LruCache.ofMaxSize(2);
+        const cache = LruCache.ofCapacity(2);
 
         await cache.set('key', 'value');
 

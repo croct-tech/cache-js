@@ -6,24 +6,24 @@ import {CacheProvider} from './cacheProvider';
 export class LruCache<T = any> implements CacheProvider<string, T> {
     private cache = new Map<string, T>();
 
-    private readonly maxSize: number;
+    private readonly capacity: number;
 
-    private constructor(maxSize: number) {
-        this.maxSize = maxSize;
+    private constructor(capacity: number) {
+        this.capacity = capacity;
     }
 
     /**
      * Creates a new LRU cache with the given maximum size.
      *
-     * @param {number} maxSize The maximum number of entries in the cache. Must be a
+     * @param {number} capacity The maximum number of entries in the cache. Must be a
      *      positive safe integer.
      */
-    public static ofMaxSize(maxSize: number): LruCache {
-        if (!Number.isSafeInteger(maxSize) || maxSize < 1) {
-            throw new Error('LRU max size must be a positive safe integer.');
+    public static ofCapacity(capacity: number): LruCache {
+        if (!Number.isSafeInteger(capacity) || capacity < 1) {
+            throw new Error('LRU capacity must be a positive safe integer.');
         }
 
-        return new this(maxSize);
+        return new this(capacity);
     }
 
     public get(key: string, loader: (key: string) => Promise<T>): Promise<T> {
@@ -43,7 +43,7 @@ export class LruCache<T = any> implements CacheProvider<string, T> {
     public set(key: string, value: T): Promise<void> {
         this.cache.set(key, value);
 
-        while (this.cache.size > this.maxSize) {
+        while (this.cache.size > this.capacity) {
             const leastRecentlyUsedKey = this.cache
                 .keys()
                 .next();
