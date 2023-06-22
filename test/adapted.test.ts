@@ -138,7 +138,7 @@ describe('A cache adapter that can transform keys and values', () => {
 
         const result = transformer(value);
 
-        expect(result).toBe('DB8pVafUNdepTqZc8eE5qw==');
+        expect(result).toBe('oDA+C/1fqcOT90c6vwhaWg==');
     });
 
     it('should transform a value into its JSON representation', () => {

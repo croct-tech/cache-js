@@ -33,7 +33,7 @@
     "@croct-tech/time": "^0.8.0",
     "@croct/json": "^2.0.0",
     "@croct/logging": "^0.2.2",
-    "object-hash": "^3.0.0"
+    "node-object-hash": "^3.0.0"
   },
   "devDependencies": {
     "@croct/eslint-plugin": "^0.6.0",
