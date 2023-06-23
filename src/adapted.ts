@@ -96,7 +96,7 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
         );
     }
 
-    public async  delete(key: K): Promise<void> {
+    public async delete(key: K): Promise<void> {
         return this.cache.delete(await this.keyTransformer(key));
     }
 
