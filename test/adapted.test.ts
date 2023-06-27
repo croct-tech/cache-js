@@ -195,4 +195,31 @@ describe('A cache adapter that can transform keys and values', () => {
 
         expect(result).toStrictEqual(value);
     });
+
+    it('should support async transformation', async () => {
+        const keyTransformer = jest.fn().mockResolvedValue('transformed');
+        const inputTransformer = jest.fn().mockResolvedValue('inputTransformed');
+        const outputTransformer = jest.fn().mockResolvedValue('outputTransformed');
+        const adaptedCache = new AdaptedCache({
+            cache: mockCache,
+            keyTransformer: keyTransformer,
+            valueInputTransformer: inputTransformer,
+            valueOutputTransformer: outputTransformer,
+        });
+
+        await adaptedCache.set('key', 'value');
+
+        expect(keyTransformer).toHaveBeenCalledWith('key');
+        expect(inputTransformer).toHaveBeenCalledWith('value');
+        expect(mockCache.set).toHaveBeenCalledWith('transformed', 'inputTransformed');
+
+        const loader = jest.fn();
+
+        mockCache.get.mockResolvedValue('output');
+
+        const result = await adaptedCache.get('key', loader);
+
+        expect(outputTransformer).toHaveBeenCalledWith('output');
+        expect(result).toBe('outputTransformed');
+    });
 });
