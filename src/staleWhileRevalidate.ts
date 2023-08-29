@@ -4,8 +4,19 @@ import {CacheLoader, CacheProvider} from './cacheProvider';
 import {TimestampedCacheEntry} from './timestampedCacheEntry';
 
 type Configuration<K, V> = {
+    /**
+     * The underlying cache provider to use.
+     */
     cacheProvider: CacheProvider<K, TimestampedCacheEntry<V>>,
+
+    /**
+     * The freshness period in seconds for cached data.
+     */
     freshPeriod: number,
+
+    /**
+     * The clock to use. The default clock is used if none is given
+     */
     clock?: Clock,
 
     /**
@@ -23,12 +34,6 @@ export class StaleWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
     private readonly errorHandler: (error: Error) => void;
 
-    /**
-     * @param cacheProvider The underlying cache provider to use.
-     * @param freshPeriod The freshness period in seconds for cached data.
-     * @param clock The clock to use. The default clock is used if none is given.
-     * @param errorHandler The error handler when repopulating the cache fails.
-     */
     public constructor({cacheProvider, freshPeriod, clock, errorHandler}: Configuration<K, V>) {
         this.cacheProvider = cacheProvider;
         this.freshPeriod = freshPeriod;
