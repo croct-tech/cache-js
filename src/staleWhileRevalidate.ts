@@ -23,11 +23,17 @@ export class StaleWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
     private readonly errorHandler: (error: Error) => void;
 
-    public constructor(config: Configuration<K, V>) {
-        this.cacheProvider = config.cacheProvider;
-        this.freshPeriod = config.freshPeriod;
-        this.clock = config.clock ?? DefaultClockProvider.getClock();
-        this.errorHandler = config.errorHandler ?? ((): void => { /* noop */ });
+    /**
+     * @param cacheProvider The underlying cache provider to use.
+     * @param freshPeriod The freshness period in seconds for cached data.
+     * @param clock The clock to use. The default clock is used if none is given.
+     * @param errorHandler The error handler when repopulating the cache fails.
+     */
+    public constructor({cacheProvider, freshPeriod, clock, errorHandler}: Configuration<K, V>) {
+        this.cacheProvider = cacheProvider;
+        this.freshPeriod = freshPeriod;
+        this.clock = clock ?? DefaultClockProvider.getClock();
+        this.errorHandler = errorHandler ?? ((): void => { /* noop */ });
     }
 
     public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {

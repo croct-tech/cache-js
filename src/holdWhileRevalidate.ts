@@ -16,6 +16,11 @@ export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
     private readonly clock: Clock;
 
+    /**
+     * @param cacheProvider The underlying cache provider to use.
+     * @param maxAge The maximum time period in seconds for cached data.
+     * @param clock The clock to use. The default clock is used if none is given.
+     */
     public constructor({cacheProvider, maxAge, clock}: Configuration<K, V>) {
         this.cacheProvider = cacheProvider;
         this.maxAge = maxAge;
