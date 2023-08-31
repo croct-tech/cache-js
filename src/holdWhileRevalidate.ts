@@ -10,12 +10,12 @@ type Configuration<K, V> = {
     cacheProvider: CacheProvider<K, TimestampedCacheEntry<V>>,
 
     /**
-     * The maximum time period in seconds for cached data.
+     * The maximum retention period.
      */
     maxAge: number,
 
     /**
-     * The clock to use. The default clock is used if none is given.
+     * The clock to use for time-related operations.
      */
     clock?: Clock,
 };

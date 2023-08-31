@@ -20,7 +20,7 @@ type Configuration<K, V> = {
     clock?: Clock,
 
     /**
-     * Handler for background revalidation errors
+     * The clock to use for time-related operations.
      */
     errorHandler?: (error: Error) => void,
 };
