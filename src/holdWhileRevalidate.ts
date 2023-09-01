@@ -10,7 +10,7 @@ type Configuration<K, V> = {
     cacheProvider: CacheProvider<K, TimestampedCacheEntry<V>>,
 
     /**
-     * The maximum retention period.
+     * The maximum retention period in seconds.
      */
     maxAge: number,
 
