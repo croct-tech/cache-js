@@ -4,8 +4,33 @@ import {CacheLoader, CacheProvider} from './cacheProvider';
 import {TimestampedCacheEntry} from './timestampedCacheEntry';
 
 type Configuration<K, V> = {
+    /**
+     * The underlying cache provider to use for storing the cached data.
+     */
     cacheProvider: CacheProvider<K, TimestampedCacheEntry<V>>,
+
+    /**
+     * The maximum retention period of the cached data in seconds.
+     *
+     * It defines the time duration for which the cache entry is
+     * retained. Once the maximum age expires, the cache entry
+     * will be removed and a new value will be retrieved using
+     * the provided loader.
+     *
+     * For example, if maxAge is set to 3600 seconds (1 hour),
+     * the cache entry will be retained for 1 hour. After 1 hour,
+     * it will be removed and a new value will be retrieved.
+     */
     maxAge: number,
+
+    /**
+     * The clock to use for time-related operations.
+     *
+     * It is used for retrieving the current time and for time calculations.
+     * If not provided, the default clock is used.
+     *
+     *  @default DefaultClockProvider.getClock()
+     */
     clock?: Clock,
 };
 
