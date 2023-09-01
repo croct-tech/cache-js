@@ -15,12 +15,12 @@ type Configuration<K, V> = {
      * It defines the time duration for which the cache entry
      * is considered fresh. Once the freshness period expires,
      * the data will be revalidated in the background while
-     * still serving the stale value.
+     * still serving the stale value on subsequent gets.
      *
      * For example, if freshPeriod is set to 60 seconds,
      * the cache entry will be considered fresh for 60 seconds
      * after its creation or update. After 60 seconds, it will be
-     * revalidated in the background on subsequent gets, but the stale value
+     * evaluated in the background on subsequent gets, but the stale value
      * will still be served until the revalidation is complete.
      */
     freshPeriod: number,
