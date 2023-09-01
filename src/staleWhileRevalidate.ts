@@ -15,12 +15,12 @@ type Configuration<K, V> = {
     freshPeriod: number,
 
     /**
-     * The clock to use. The default clock is used if none is given
+     * The clock to use for time-related operations.
      */
     clock?: Clock,
 
     /**
-     * The clock to use for time-related operations.
+     * Handler for background revalidation errors
      */
     errorHandler?: (error: Error) => void,
 };
