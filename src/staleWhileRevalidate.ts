@@ -20,8 +20,8 @@ type Configuration<K, V> = {
      * For example, if freshPeriod is set to 60 seconds,
      * the cache entry will be considered fresh for 60 seconds
      * after its creation or update. After 60 seconds, it will be
-     * revalidated in the background, but the stale value will
-     * still be served until the revalidation is complete.
+     * revalidated in the background on subsequent gets, but the stale value
+     * will still be served until the revalidation is complete.
      */
     freshPeriod: number,
 
