@@ -2,7 +2,7 @@ import {extractErrorMessage, InMemoryLogger, LogLevel} from '@croct/logging';
 import {NoopCache} from '../src';
 import {DefaultWhileMissCache} from '../src/defaultWhileMiss';
 
-describe('A cache provider that returns a default value if a timeout happens', () => {
+describe('A cache provider that returns a default value if a timeout occurs', () => {
     it('should return the inner cache value when it returns before the timeout', async () => {
         const inner = new NoopCache();
 
