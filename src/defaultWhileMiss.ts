@@ -34,12 +34,12 @@ export class DefaultWhileMissCache<K, V> implements CacheProvider<K, V> {
 
         return Promise.race([
             resolveWithTimeout(this.defaultValue),
-            this.cacheProvider.get(key, loader),
-        ]).catch(error => {
-            this.errorHandler(error);
+            this.cacheProvider.get(key, loader).catch(error => {
+                this.errorHandler(error);
 
-            return this.defaultValue;
-        });
+                return this.defaultValue;
+            }),
+        ]);
     }
 
     public set(key: K, value: V): Promise<void> {
