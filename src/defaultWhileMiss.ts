@@ -28,11 +28,11 @@ export class DefaultWhileMissCache<K, V> implements CacheProvider<K, V> {
     }
 
     public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
-        const resolveWithTimeout = (value: V): Promise<V> => new Promise<V>(resolve => {
+        const resolveWithTimeout = (value: V): Promise<V> => new Promise(resolve => {
             setTimeout(() => resolve(value), this.timeout);
         });
 
-        return Promise.race<V>([
+        return Promise.race([
             resolveWithTimeout(this.defaultValue),
             this.cacheProvider.get(key, loader),
         ]).catch(error => {
