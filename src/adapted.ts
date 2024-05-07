@@ -2,7 +2,7 @@ import {JsonCompatible, JsonValue} from '@croct/json';
 import {hasher, HasherOptions} from 'node-object-hash';
 import {CacheLoader, CacheProvider} from './cacheProvider';
 
-export type Transformer<D, S> = (value: D) => S;
+export type Transformer<D, S> = (value: D) => Promise<S> | S;
 
 export type HashAlgorithm = 'passthrough' | 'md5' | 'sha1';
 
@@ -80,24 +80,24 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
         });
     }
 
-    public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
+    public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         return this.cache
             .get(
-                this.keyTransformer(key),
+                await this.keyTransformer(key),
                 () => loader(key).then(this.valueInputTransformer),
             )
             .then(this.valueOutputTransformer);
     }
 
-    public set(key: K, value: V): Promise<void> {
+    public async set(key: K, value: V): Promise<void> {
         return this.cache.set(
-            this.keyTransformer(key),
-            this.valueInputTransformer(value),
+            await this.keyTransformer(key),
+            await this.valueInputTransformer(value),
         );
     }
 
-    public delete(key: K): Promise<void> {
-        return this.cache.delete(this.keyTransformer(key));
+    public async delete(key: K): Promise<void> {
+        return this.cache.delete(await this.keyTransformer(key));
     }
 
     public static createHashSerializer(algorithm?: HashAlgorithm): Transformer<any, string> {
