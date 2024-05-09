@@ -1,6 +1,6 @@
 import {CacheLoader, CacheProvider} from './cacheProvider';
 
-type Configuration<K, V> = {
+export type Configuration<K, V> = {
     cacheProvider: CacheProvider<K, V>,
     defaultValue: V,
 
