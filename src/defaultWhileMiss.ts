@@ -3,7 +3,6 @@ import {CacheLoader, CacheProvider} from './cacheProvider';
 export type Configuration<K, V> = {
     provider: CacheProvider<K, V>,
     defaultValue: V,
-
     /**
      * Handler for background revalidation errors
      */
