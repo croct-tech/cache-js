@@ -1,4 +1,4 @@
-import {Instant} from '@croct-tech/time';
+import {Instant} from '@croct/time';
 import {JsonValue} from '@croct/json';
 import {TimestampedCacheEntry} from '../src';
 

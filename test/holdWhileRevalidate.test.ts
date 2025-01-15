@@ -1,5 +1,5 @@
-import {Instant, TimeZone} from '@croct-tech/time';
-import {FixedClock} from '@croct-tech/time/clock/fixedClock';
+import {Instant, TimeZone} from '@croct/time';
+import {FixedClock} from '@croct/time/clock/fixedClock';
 import {CacheProvider, HoldWhileRevalidateCache, TimestampedCacheEntry} from '../src';
 
 describe('A cache provider that holds while revalidating the cache', () => {
