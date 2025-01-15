@@ -7,7 +7,7 @@
     "email": "lib+cache-js@croct.com",
     "url": "https://github.com/croct-tech/cache-js"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "keywords": [
     "croct",
     "caching",
