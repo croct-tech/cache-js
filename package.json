@@ -40,8 +40,8 @@
     "@croct/eslint-plugin": "^0.7.0",
     "@types/jest": "^29.0.0",
     "@types/object-hash": "^3.0.0",
-    "@typescript-eslint/parser": "^6.0",
-    "eslint": "^8.8",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^9.0.0",
     "jest": "^29.0.0",
     "ts-jest": "^29.0.0",
     "typescript": "^5.0.0"
