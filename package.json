@@ -1,5 +1,5 @@
 {
-  "name": "@croct-tech/cache",
+  "name": "@croct/cache",
   "version": "0.0.0-dev",
   "description": "An abstraction layer for caching.",
   "author": {
@@ -31,7 +31,7 @@
     "build": "tsc -p tsconfig.build.json && cp package.json build/"
   },
   "dependencies": {
-    "@croct-tech/time": "^0.9.0",
+    "@croct/time": "^0.10.0",
     "@croct/json": "^2.0.0",
     "@croct/logging": "^0.2.2",
     "node-object-hash": "^3.0.0"

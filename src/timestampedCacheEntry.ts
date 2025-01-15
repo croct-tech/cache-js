@@ -1,4 +1,4 @@
-import {Instant} from '@croct-tech/time';
+import {Instant} from '@croct/time';
 import {JsonCompatible, JsonValue} from '@croct/json';
 
 /**

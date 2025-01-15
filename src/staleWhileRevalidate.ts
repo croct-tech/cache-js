@@ -1,5 +1,5 @@
-import {Clock, Instant} from '@croct-tech/time';
-import {DefaultClockProvider} from '@croct-tech/time/defaultClockProvider';
+import {Clock, Instant} from '@croct/time';
+import {DefaultClockProvider} from '@croct/time/defaultClockProvider';
 import {CacheLoader, CacheProvider} from './cacheProvider';
 import {TimestampedCacheEntry} from './timestampedCacheEntry';
 

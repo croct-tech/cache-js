@@ -3,7 +3,7 @@ name: Validations
 on:
   push:
     tags-ignore:
-      - '**'
+      - "**"
     branches:
       - master
   pull_request:
@@ -22,10 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: 'https://npm.pkg.github.com'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          node-version: 20
 
       - name: Cache dependencies
         id: cache-dependencies
@@ -49,10 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: 'https://npm.pkg.github.com'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          node-version: 20
 
       - name: Cache dependencies
         id: cache-dependencies
@@ -74,10 +68,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: 'https://npm.pkg.github.com'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          node-version: 20
 
       - name: Cache dependencies
         id: cache-dependencies
@@ -99,10 +90,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: 'https://npm.pkg.github.com'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          node-version: 20
 
       - name: Cache dependencies
         id: cache-dependencies
@@ -115,10 +103,9 @@ jobs:
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: npm ci
 
-      - uses: paambaati/codeclimate-action@v8.0.0
+      - uses: paambaati/codeclimate-action@v9.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageCommand: npm run test
-          coverageLocations:
-            ./coverage/lcov.info:lcov
+          coverageLocations: ./coverage/lcov.info:lcov

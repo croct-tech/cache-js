@@ -25,7 +25,7 @@
 We recommend using [NPM](https://www.npmjs.com) to install the package:
 
 ```sh
-npm install @croct-tech/cache
+npm install @croct/cache
 ```
 
 ## Basic usage 
