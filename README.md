@@ -9,9 +9,9 @@
 </p>
 <p align="center">
     <img alt="Build" src="https://github.com/croct-tech/cache-js/actions/workflows/validate-branch.yaml/badge.svg" />
-    <a href="https://codeclimate.com/repos/621adab1f58476018c0002f1/test_coverage"><img src="https://api.codeclimate.com/v1/badges/44752b2e8f1f990799da/test_coverage" /></a>
-    <a href="https://codeclimate.com/repos/621adab1f58476018c0002f1/maintainability"><img src="https://api.codeclimate.com/v1/badges/44752b2e8f1f990799da/maintainability" /></a>
-    <br />
+    <a href="https://qlty.sh/gh/croct-tech/projects/cache-js"><img src="https://qlty.sh/badges/0bb508c4-718a-4b95-bf4c-7fa1287bc0d9/coverage.svg" alt="Code Coverage" /></a>
+<a href="https://qlty.sh/gh/croct-tech/projects/cache-js"><img src="https://qlty.sh/badges/0bb508c4-718a-4b95-bf4c-7fa1287bc0d9/maintainability.svg" alt="Maintainability" /></a>
+<br />
     <br />
     <a href="https://github.com/croct-tech/cache-js/releases">📦Releases</a>
     ·
