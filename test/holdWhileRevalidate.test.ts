@@ -72,6 +72,40 @@ describe('A cache provider that holds while revalidating the cache', () => {
         expect(mockCache.set).toHaveBeenCalledWith('key', expectedEntry);
     });
 
+    it('should expire entries according to the specified logic', async () => {
+        const now = Instant.ofEpochMilli(12345);
+        const clock = FixedClock.of(now, TimeZone.UTC);
+
+        const cachedEntry: TimestampedCacheEntry<string> = {
+            value: 'cachedValue',
+            timestamp: now.plusSeconds(-11),
+        };
+
+        mockCache.get.mockResolvedValue(cachedEntry);
+        mockCache.set.mockResolvedValue();
+
+        const loader = jest.fn().mockResolvedValue('loaderValue');
+
+        const cache = new HoldWhileRevalidateCache({
+            cacheProvider: mockCache,
+            clock: clock,
+            maxAge: (): number => 10,
+        });
+
+        await expect(cache.get('key', loader)).resolves.toBe('loaderValue');
+
+        expect(mockCache.get).toHaveBeenCalledWith('key', expect.any(Function));
+
+        expect(loader).toHaveBeenCalledWith('key');
+
+        const expectedEntry: TimestampedCacheEntry<string> = {
+            value: 'loaderValue',
+            timestamp: now,
+        };
+
+        expect(mockCache.set).toHaveBeenCalledWith('key', expectedEntry);
+    });
+
     it('should return the non-expired cached value', async () => {
         const now = Instant.ofEpochMilli(12345);
         const clock = FixedClock.of(now, TimeZone.UTC);

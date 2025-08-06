@@ -21,7 +21,7 @@ type Configuration<K, V> = {
      * the cache entry will be retained for 1 hour. After 1 hour,
      * it will be removed and a new value will be retrieved.
      */
-    maxAge: number,
+    maxAge: number | ((key: K, value: V) => number),
 
     /**
      * The clock to use for time-related operations.
@@ -37,7 +37,7 @@ type Configuration<K, V> = {
 export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
     private readonly cacheProvider: Configuration<K, V>['cacheProvider'];
 
-    private readonly maxAge: number;
+    private readonly maxAge: number | ((key: K, value: V) => number);
 
     private readonly clock: Clock;
 
@@ -63,7 +63,11 @@ export class HoldWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
         const possiblyStaleEntry = await this.cacheProvider.get(key, retrieveAndSave);
 
-        if (now.isAfter(possiblyStaleEntry.timestamp.plusSeconds(this.maxAge))) {
+        const maxAge = typeof this.maxAge === 'function'
+            ? this.maxAge(key, possiblyStaleEntry.value)
+            : this.maxAge;
+
+        if (now.isAfter(possiblyStaleEntry.timestamp.plusSeconds(maxAge))) {
             const entry = await retrieveAndSave();
 
             return entry.value;
