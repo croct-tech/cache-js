@@ -6,7 +6,7 @@ export type Configuration<K, V> = {
     /**
      * Handler for background revalidation errors
      */
-    errorHandler?: (error: Error) => void,
+    errorHandler?: (key: K, error: Error) => void,
 };
 
 export class DefaultWhileMissCache<K, V> implements CacheProvider<K, V> {
@@ -14,7 +14,7 @@ export class DefaultWhileMissCache<K, V> implements CacheProvider<K, V> {
 
     private readonly defaultValue: V;
 
-    private readonly errorHandler: (error: Error) => void;
+    private readonly errorHandler: (key: K, error: Error) => void;
 
     public constructor(config: Configuration<K, V>) {
         this.provider = config.provider;
@@ -24,7 +24,7 @@ export class DefaultWhileMissCache<K, V> implements CacheProvider<K, V> {
 
     public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         return this.provider.get(key, innerKey => {
-            loader(innerKey).catch(this.errorHandler);
+            loader(innerKey).catch(error => this.errorHandler(key, error));
 
             return Promise.resolve(this.defaultValue);
         });

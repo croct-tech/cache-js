@@ -44,7 +44,7 @@ describe('A cache provider that returns a default value while loading in the bac
         expect(loader).toHaveBeenCalledWith('key');
 
         expect(errorHandler).toHaveBeenCalledTimes(1);
-        expect(errorHandler).toHaveBeenCalledWith(error);
+        expect(errorHandler).toHaveBeenCalledWith('key', error);
     });
 
     it('should delegate setting a value to the underlying provider', async () => {

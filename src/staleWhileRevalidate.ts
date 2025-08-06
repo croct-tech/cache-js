@@ -23,7 +23,7 @@ type Configuration<K, V> = {
      * evaluated in the background on subsequent gets, but the stale value
      * will still be served until the revalidation is complete.
      */
-    freshPeriod: number,
+    freshPeriod: number | ((key: K, value: V) => number),
 
     /**
      * The clock to use for time-related operations.
@@ -44,17 +44,17 @@ type Configuration<K, V> = {
      *
      * The most common use case for this handler is logging.
      */
-    errorHandler?: (error: Error) => void,
+    errorHandler?: (key: K, error: Error) => void,
 };
 
 export class StaleWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
     private readonly cacheProvider: Configuration<K, V>['cacheProvider'];
 
-    private readonly freshPeriod: number;
+    private readonly freshPeriod: number | ((key: K, value: V) => number);
 
     private readonly clock: Clock;
 
-    private readonly errorHandler: (error: Error) => void;
+    private readonly errorHandler: (key: K, error: Error) => void;
 
     public constructor(config: Configuration<K, V>) {
         this.cacheProvider = config.cacheProvider;
@@ -79,9 +79,13 @@ export class StaleWhileRevalidateCache<K, V> implements CacheProvider<K, V> {
 
         const possiblyStaleEntry = await this.cacheProvider.get(key, retrieveAndSave);
 
-        if (now.isAfter(possiblyStaleEntry.timestamp.plusSeconds(this.freshPeriod))) {
+        const freshPeriod = typeof this.freshPeriod === 'function'
+            ? this.freshPeriod(key, possiblyStaleEntry.value)
+            : this.freshPeriod;
+
+        if (now.isAfter(possiblyStaleEntry.timestamp.plusSeconds(freshPeriod))) {
             // If expired revalidate on the background and return cached value
-            retrieveAndSave().catch(this.errorHandler);
+            retrieveAndSave().catch(error => this.errorHandler(key, error));
         }
 
         return possiblyStaleEntry.value;
