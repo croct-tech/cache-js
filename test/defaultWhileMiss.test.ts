@@ -1,3 +1,4 @@
+import * as timers from 'node:timers/promises';
 import {DefaultWhileMissCache, NoopCache} from '../src';
 
 describe('A cache provider that returns a default value while loading in the background', () => {
@@ -16,6 +17,8 @@ describe('A cache provider that returns a default value while loading in the bac
         await expect(cache.get('key', loader)).resolves.toBe('defaultValue');
 
         expect(provider.get).toHaveBeenCalledWith('key', expect.any(Function));
+
+        await timers.setImmediate();
 
         expect(loader).toHaveBeenCalledWith('key');
     });
@@ -40,6 +43,8 @@ describe('A cache provider that returns a default value while loading in the bac
         await expect(cache.get('key', loader)).resolves.toBe('defaultValue');
 
         expect(provider.get).toHaveBeenCalledWith('key', expect.any(Function));
+
+        await timers.setImmediate();
 
         expect(loader).toHaveBeenCalledWith('key');
 
