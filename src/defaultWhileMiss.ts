@@ -24,7 +24,9 @@ export class DefaultWhileMissCache<K, V> implements CacheProvider<K, V> {
 
     public get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         return this.provider.get(key, innerKey => {
-            loader(innerKey).catch(error => this.errorHandler(key, error));
+            // Schedule loading in the next tick avoiding resolving
+            // before the surrounding cache retrieval resolves
+            setImmediate(() => loader(innerKey).catch(error => this.errorHandler(key, error)));
 
             return Promise.resolve(this.defaultValue);
         });
