@@ -65,13 +65,13 @@ export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
     public set(key: K, value: V): Promise<void> {
         return this.cache
             .set(key, value)
-            .catch(void this.logProviderError);
+            .catch(this.logProviderError);
     }
 
     public delete(key: K): Promise<void> {
         return this.cache
             .delete(key)
-            .catch(void this.logProviderError);
+            .catch(this.logProviderError);
     }
 
     private logLoaderError(error: unknown): void {

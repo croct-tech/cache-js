@@ -33,6 +33,7 @@ export default defineConfig(
                     message: 'Do not create a Date instance, use a clock.',
                 },
             ],
+            '@typescript-eslint/unbound-method': 'off',
         },
     },
     {
