@@ -1,4 +1,5 @@
-import {AutoSaveCache, CacheProvider} from '../src';
+import type {CacheProvider} from '../src';
+import {AutoSaveCache} from '../src';
 
 describe('A cache provider that automatically saves loaded values', () => {
     const mockCache: jest.MockedObject<CacheProvider<any, any>> = {

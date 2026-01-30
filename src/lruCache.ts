@@ -1,4 +1,4 @@
-import {CacheProvider} from './cacheProvider';
+import type {CacheProvider} from './cacheProvider';
 
 /**
  * In-memory Least Recently Used (LRU) cache.

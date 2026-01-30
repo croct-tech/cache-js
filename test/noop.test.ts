@@ -1,4 +1,5 @@
-import {CacheProvider, NoopCache} from '../src';
+import type {CacheProvider} from '../src';
+import {NoopCache} from '../src';
 
 describe('A no-op cache', () => {
     it('should load fresh values', async () => {

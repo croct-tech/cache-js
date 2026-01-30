@@ -1,4 +1,5 @@
-import {AdaptedCache, CacheProvider} from '../src';
+import type {CacheProvider} from '../src';
+import {AdaptedCache} from '../src';
 
 describe('A cache adapter that can transform keys and values', () => {
     const mockCache: jest.MockedObject<CacheProvider<string, string>> = {

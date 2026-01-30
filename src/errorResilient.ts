@@ -1,5 +1,6 @@
-import {extractErrorMessage, Log, Logger, LogLevel} from '@croct/logging';
-import {CacheLoader, CacheProvider} from './cacheProvider';
+import type {Log, Logger} from '@croct/logging';
+import {extractErrorMessage, LogLevel} from '@croct/logging';
+import type {CacheLoader, CacheProvider} from './cacheProvider';
 
 type CacheErrorLog = Log<{
     errorMessage: string,
@@ -64,13 +65,13 @@ export class ErrorResilientCache<K, V> implements CacheProvider<K, V> {
     public set(key: K, value: V): Promise<void> {
         return this.cache
             .set(key, value)
-            .catch(this.logProviderError);
+            .catch(void this.logProviderError);
     }
 
     public delete(key: K): Promise<void> {
         return this.cache
             .delete(key)
-            .catch(this.logProviderError);
+            .catch(void this.logProviderError);
     }
 
     private logLoaderError(error: unknown): void {

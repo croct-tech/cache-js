@@ -1,5 +1,5 @@
 import {Instant} from '@croct/time';
-import {JsonValue} from '@croct/json';
+import type {JsonValue} from '@croct/json';
 import {TimestampedCacheEntry} from '../src';
 
 describe('A cache entry associated with a timestamp', () => {

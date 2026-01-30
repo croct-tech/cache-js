@@ -1,4 +1,5 @@
-import {CacheProvider, PrefixedCache} from '../src';
+import type {CacheProvider} from '../src';
+import {PrefixedCache} from '../src';
 
 describe('A cache wrapper that adds a prefix to the keys', () => {
     const mockCache: jest.MockedObject<CacheProvider<string, string>> = {

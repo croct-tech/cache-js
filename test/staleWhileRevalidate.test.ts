@@ -1,6 +1,7 @@
 import {Instant, TimeZone} from '@croct/time';
 import {FixedClock} from '@croct/time/clock/fixedClock';
-import {CacheProvider, StaleWhileRevalidateCache, TimestampedCacheEntry} from '../src';
+import type {CacheProvider, TimestampedCacheEntry} from '../src';
+import {StaleWhileRevalidateCache} from '../src';
 
 describe('A cache provider that uses stale values while revalidating the cache', () => {
     const mockCache: jest.MockedObject<CacheProvider<any, any>> = {

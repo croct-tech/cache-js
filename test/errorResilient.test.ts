@@ -1,5 +1,7 @@
-import {InMemoryLogger, Log, LogLevel} from '@croct/logging';
-import {CacheProvider, ErrorResilientCache, InMemoryCache, NoopCache} from '../src';
+import type {Log} from '@croct/logging';
+import {InMemoryLogger, LogLevel} from '@croct/logging';
+import type {CacheProvider} from '../src';
+import {ErrorResilientCache, InMemoryCache, NoopCache} from '../src';
 
 class FailingCache implements CacheProvider<any, any> {
     public delete(): Promise<void> {
