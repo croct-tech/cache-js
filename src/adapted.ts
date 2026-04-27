@@ -1,6 +1,7 @@
-import {JsonCompatible, JsonValue} from '@croct/json';
-import {hasher, HasherOptions} from 'node-object-hash';
-import {CacheLoader, CacheProvider} from './cacheProvider';
+import type {JsonCompatible, JsonValue} from '@croct/json';
+import type {HasherOptions} from 'node-object-hash';
+import {hasher} from 'node-object-hash';
+import type {CacheLoader, CacheProvider} from './cacheProvider';
 
 export type Transformer<D, S> = (value: D) => Promise<S> | S;
 

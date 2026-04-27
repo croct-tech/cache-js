@@ -1,4 +1,4 @@
-import {CacheProvider} from './cacheProvider';
+import type {CacheProvider} from './cacheProvider';
 
 /**
  * A cache that prefixes keys with a string.

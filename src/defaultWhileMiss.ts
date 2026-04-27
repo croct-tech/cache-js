@@ -1,4 +1,4 @@
-import {CacheLoader, CacheProvider} from './cacheProvider';
+import type {CacheLoader, CacheProvider} from './cacheProvider';
 
 export type Configuration<K, V> = {
     provider: CacheProvider<K, V>,

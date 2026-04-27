@@ -1,4 +1,4 @@
-import {CacheLoader, CacheProvider} from './cacheProvider';
+import type {CacheLoader, CacheProvider} from './cacheProvider';
 
 /**
  * A cache that shares in-flight requests between callers.

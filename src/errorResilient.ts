@@ -1,5 +1,6 @@
-import {extractErrorMessage, Log, Logger, LogLevel} from '@croct/logging';
-import {CacheLoader, CacheProvider} from './cacheProvider';
+import type {Log, Logger} from '@croct/logging';
+import {extractErrorMessage, LogLevel} from '@croct/logging';
+import type {CacheLoader, CacheProvider} from './cacheProvider';
 
 type CacheErrorLog = Log<{
     errorMessage: string,

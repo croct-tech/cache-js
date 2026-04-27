@@ -1,5 +1,5 @@
 import {Instant} from '@croct/time';
-import {JsonCompatible, JsonValue} from '@croct/json';
+import type {JsonCompatible, JsonValue} from '@croct/json';
 
 /**
  * A cache entry associated with a timestamp.

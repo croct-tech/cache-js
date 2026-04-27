@@ -1,4 +1,4 @@
-import {CacheProvider} from './cacheProvider';
+import type {CacheProvider} from './cacheProvider';
 
 /**
  * A no-op implementation of cache provider.
