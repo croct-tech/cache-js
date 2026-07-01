@@ -26,6 +26,18 @@ We recommend using [NPM](https://www.npmjs.com) to install the package:
 npm install @croct/cache
 ```
 
+The package ships both ESM and CommonJS entry points. ESM consumers can import named exports directly:
+
+```ts
+import {InMemoryCache} from '@croct/cache';
+```
+
+CommonJS consumers can load the matching CommonJS build with `require`:
+
+```js
+const {InMemoryCache} = require('@croct/cache');
+```
+
 ## Basic usage 
 
 The most common use case of this library is to decorate implementations with caching capabilities:
@@ -192,10 +204,23 @@ Before building the project, the dependencies must be installed:
 npm install
 ```
 
-The following command builds the library:
+The following command builds the library with tsup:
 
 ```sh
 npm run build
+```
+
+The build emits ESM, CommonJS, and TypeScript declaration entry points in `build/`:
+
+- `build/index.js` for ESM consumers
+- `build/index.cjs` for CommonJS consumers
+- `build/index.js.map` and `build/index.cjs.map` for runtime debugging
+- `build/index.d.ts` and `build/index.d.cts` for TypeScript consumers
+
+To verify the published package contract, including runtime exports, declaration resolution, and dry-run package contents, run:
+
+```sh
+npm run test:package
 ```
 
 ## License
