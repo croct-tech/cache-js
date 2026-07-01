@@ -34,6 +34,17 @@
         "default": "./build/index.cjs"
       },
       "default": "./build/index.js"
+    },
+    "./*": {
+      "import": {
+        "types": "./build/*.d.ts",
+        "default": "./build/*.js"
+      },
+      "require": {
+        "types": "./build/*.d.cts",
+        "default": "./build/*.cjs"
+      },
+      "default": "./build/*.js"
     }
   },
   "main": "./build/index.cjs",
@@ -49,6 +60,7 @@
     "build": "tsup",
     "lint": "eslint 'src/**/*.ts' 'test/**/*.ts' 'tsup.config.ts' '*.mjs' 'test/*.mjs'",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js -c jest.config.mjs --coverage",
+    "test:package": "npm run build && node test/package-contract.mjs",
     "validate": "tsc --noEmit"
   },
   "dependencies": {

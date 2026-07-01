@@ -1,6 +1,6 @@
 import type {Clock} from '@croct/time';
 import {Instant} from '@croct/time';
-import {DefaultClockProvider} from '@croct/time/defaultClockProvider';
+import {DefaultClockProvider} from '@croct/time/defaultClockProvider.js';
 import type {CacheLoader, CacheProvider} from './cacheProvider';
 import type {TimestampedCacheEntry} from './timestampedCacheEntry';
 
