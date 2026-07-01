@@ -38,6 +38,8 @@ CommonJS consumers can load the matching CommonJS build with `require`:
 const {InMemoryCache} = require('@croct/cache');
 ```
 
+All source modules are also available as subpath exports, for example `@croct/cache/inMemory`.
+
 ## Basic usage 
 
 The most common use case of this library is to decorate implementations with caching capabilities:
@@ -210,12 +212,12 @@ The following command builds the library with tsup:
 npm run build
 ```
 
-The build emits ESM, CommonJS, and TypeScript declaration entry points in `build/`:
+The build emits ESM, CommonJS, source map, and TypeScript declaration files in `build/` for the root entry point and each source module:
 
-- `build/index.js` for ESM consumers
-- `build/index.cjs` for CommonJS consumers
-- `build/index.js.map` and `build/index.cjs.map` for runtime debugging
-- `build/index.d.ts` and `build/index.d.cts` for TypeScript consumers
+- `build/*.js` for ESM consumers
+- `build/*.cjs` for CommonJS consumers
+- `build/*.js.map` and `build/*.cjs.map` for runtime debugging
+- `build/*.d.ts` and `build/*.d.cts` for TypeScript consumers
 
 To verify the published package contract, including runtime exports, declaration resolution, and dry-run package contents, run:
 
