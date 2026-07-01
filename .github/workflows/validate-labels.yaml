@@ -1,6 +1,6 @@
 name: Validate labels
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - synchronize
@@ -8,22 +8,10 @@ on:
       - labeled
       - unlabeled
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: read
-
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Label migration pull requests
-        if: contains(github.head_ref, 'migration')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr edit "$PR_URL" --add-label maintenance
-
       - uses: docker://agilepathway/pull-request-label-checker:latest
         with:
           any_of: maintenance,feature,bug,enhancement
