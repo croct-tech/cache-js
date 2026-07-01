@@ -5,6 +5,17 @@ export default defineConfig(
     configs.typescript.map(config => ({
         ...config,
         files: config.files ?? ['**/*.ts', '**/*.tsx'],
+        ...(config.languageOptions === undefined
+            ? {}
+            : {languageOptions: {
+                ...config.languageOptions,
+                parserOptions: {
+                    ...config.languageOptions.parserOptions,
+                    projectService: config.languageOptions.parserOptions?.projectService === true
+                        ? {allowDefaultProject: ['*.config.ts']}
+                        : config.languageOptions.parserOptions?.projectService,
+                },
+            }}),
     })),
     {
         files: ['src/**/*.ts'],
@@ -62,9 +73,6 @@ export default defineConfig(
         files: ['tsup.config.ts'],
         languageOptions: {
             parserOptions: {
-                projectService: {
-                    allowDefaultProject: ['tsup.config.ts'],
-                },
                 tsconfigRootDir: import.meta.dirname,
             },
         },
