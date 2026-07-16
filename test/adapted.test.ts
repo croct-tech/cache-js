@@ -1,5 +1,5 @@
 import type {CacheProvider} from '../src';
-import {AdaptedCache} from '../src';
+import {AdaptedCache, SharedInFlightCache} from '../src';
 
 describe('A cache adapter that can transform keys and values', () => {
     const mockCache: jest.MockedObject<CacheProvider<string, string>> = {
@@ -74,11 +74,174 @@ describe('A cache adapter that can transform keys and values', () => {
         expect(loader).not.toHaveBeenCalled();
     });
 
+    it('should delete a malformed cached value and reload it through the cache', async () => {
+        mockCache.get.mockReset();
+        mockCache.delete.mockReset();
+
+        const deserializationError = new Error('Failed to deserialize cached value');
+        const keyTransformer = jest.fn().mockReturnValue('transformed-key');
+        const inputTransformer = jest.fn((value: string) => value);
+        const outputTransformer = jest.fn((value: string) => {
+            if (value === 'malformed') {
+                throw deserializationError;
+            }
+
+            return value;
+        });
+        const loader = jest.fn().mockResolvedValue('fresh');
+        const cache = new AdaptedCache({
+            cache: mockCache,
+            keyTransformer: keyTransformer,
+            valueInputTransformer: inputTransformer,
+            valueOutputTransformer: outputTransformer,
+        });
+
+        mockCache.get
+            .mockResolvedValueOnce('malformed')
+            .mockImplementationOnce((_key, cacheLoader) => cacheLoader('transformed-key'));
+
+        await expect(cache.get('key', loader)).resolves.toBe('fresh');
+
+        expect(keyTransformer).toHaveBeenCalledTimes(1);
+        expect(mockCache.get).toHaveBeenCalledTimes(2);
+        expect(mockCache.get).toHaveBeenNthCalledWith(1, 'transformed-key', expect.any(Function));
+        expect(mockCache.get).toHaveBeenNthCalledWith(2, 'transformed-key', expect.any(Function));
+        expect(mockCache.delete).toHaveBeenCalledTimes(1);
+        expect(mockCache.delete).toHaveBeenCalledWith('transformed-key');
+        expect(loader).toHaveBeenCalledTimes(1);
+        expect(loader).toHaveBeenCalledWith('key');
+        expect(inputTransformer).toHaveBeenCalledWith('fresh');
+        expect(outputTransformer).toHaveBeenNthCalledWith(1, 'malformed');
+        expect(outputTransformer).toHaveBeenNthCalledWith(2, 'fresh');
+    });
+
+    it('should propagate deserialization errors from freshly loaded values without retrying', async () => {
+        mockCache.get.mockReset();
+        mockCache.delete.mockReset();
+
+        const deserializationError = new Error('Failed to deserialize loaded value');
+        const keyTransformer = jest.fn().mockReturnValue('transformed-key');
+        const inputTransformer = jest.fn((value: string) => value);
+        const outputTransformer = jest.fn(() => {
+            throw deserializationError;
+        });
+        const loader = jest.fn().mockResolvedValue('malformed');
+        const cache = new AdaptedCache({
+            cache: mockCache,
+            keyTransformer: keyTransformer,
+            valueInputTransformer: inputTransformer,
+            valueOutputTransformer: outputTransformer,
+        });
+
+        mockCache.get.mockImplementation((_key, cacheLoader) => cacheLoader('transformed-key'));
+
+        await expect(cache.get('key', loader)).rejects.toThrow(deserializationError);
+
+        expect(mockCache.get).toHaveBeenCalledTimes(1);
+        expect(mockCache.get).toHaveBeenCalledWith('transformed-key', expect.any(Function));
+        expect(mockCache.delete).not.toHaveBeenCalled();
+        expect(loader).toHaveBeenCalledTimes(1);
+        expect(loader).toHaveBeenCalledWith('key');
+        expect(inputTransformer).toHaveBeenCalledWith('malformed');
+        expect(outputTransformer).toHaveBeenCalledWith('malformed');
+    });
+
+    it('should propagate shared freshly loaded deserialization errors without retrying', async () => {
+        mockCache.get.mockReset();
+        mockCache.delete.mockReset();
+
+        const deserializationError = new Error('Failed to deserialize shared loaded value');
+        const inputTransformer = jest.fn((value: string) => value);
+        const outputTransformer = jest.fn(() => {
+            throw deserializationError;
+        });
+        const sharedCache = new SharedInFlightCache(mockCache);
+        const cache = AdaptedCache.transformValues(sharedCache, inputTransformer, outputTransformer);
+
+        let resolveLoader: (value: string) => void = () => { /* noop */ };
+        const firstLoader = jest.fn(
+            () => new Promise<string>(resolve => {
+                resolveLoader = resolve;
+            }),
+        );
+        const secondLoader = jest.fn();
+
+        mockCache.get.mockImplementation((_key, cacheLoader) => cacheLoader('key'));
+
+        const firstRequest = cache.get('key', firstLoader);
+
+        await Promise.resolve();
+
+        const secondRequest = cache.get('key', secondLoader);
+
+        resolveLoader('malformed');
+
+        const results = await Promise.allSettled([firstRequest, secondRequest]);
+
+        expect(results).toStrictEqual([
+            {status: 'rejected', reason: deserializationError},
+            {status: 'rejected', reason: deserializationError},
+        ]);
+        expect(mockCache.get).toHaveBeenCalledTimes(1);
+        expect(mockCache.delete).not.toHaveBeenCalled();
+        expect(firstLoader).toHaveBeenCalledTimes(1);
+        expect(secondLoader).not.toHaveBeenCalled();
+        expect(inputTransformer).toHaveBeenCalledTimes(1);
+        expect(outputTransformer).toHaveBeenCalledTimes(1);
+    });
+    it('should recover a malformed cached value after starting background revalidation', async () => {
+        mockCache.get.mockReset();
+        mockCache.delete.mockReset();
+
+        const deserializationError = new Error('Failed to deserialize cached value');
+        const keyTransformer = jest.fn().mockReturnValue('transformed-key');
+        const inputTransformer = jest.fn((value: string) => value);
+        const outputTransformer = jest.fn((value: string) => {
+            if (value === 'malformed') {
+                throw deserializationError;
+            }
+
+            return value;
+        });
+        const loader = jest.fn().mockResolvedValue('fresh');
+        const cache = new AdaptedCache({
+            cache: mockCache,
+            keyTransformer: keyTransformer,
+            valueInputTransformer: inputTransformer,
+            valueOutputTransformer: outputTransformer,
+        });
+
+        mockCache.get
+            .mockImplementationOnce(async (_key, cacheLoader) => {
+                await cacheLoader('transformed-key');
+
+                return 'malformed';
+            })
+            .mockImplementationOnce((_key, cacheLoader) => cacheLoader('transformed-key'));
+
+        await expect(cache.get('key', loader)).resolves.toBe('fresh');
+
+        expect(keyTransformer).toHaveBeenCalledTimes(1);
+        expect(mockCache.get).toHaveBeenCalledTimes(2);
+        expect(mockCache.get).toHaveBeenNthCalledWith(1, 'transformed-key', expect.any(Function));
+        expect(mockCache.get).toHaveBeenNthCalledWith(2, 'transformed-key', expect.any(Function));
+        expect(mockCache.delete).toHaveBeenCalledTimes(1);
+        expect(mockCache.delete).toHaveBeenCalledWith('transformed-key');
+        expect(loader).toHaveBeenCalledTimes(2);
+        expect(loader).toHaveBeenCalledWith('key');
+        expect(inputTransformer).toHaveBeenCalledTimes(2);
+        expect(inputTransformer).toHaveBeenCalledWith('fresh');
+        expect(outputTransformer).toHaveBeenNthCalledWith(1, 'fresh');
+        expect(outputTransformer).toHaveBeenNthCalledWith(2, 'malformed');
+        expect(outputTransformer).toHaveBeenNthCalledWith(3, 'fresh');
+        expect(outputTransformer).toHaveBeenNthCalledWith(4, 'fresh');
+    });
+
     it('should apply the value input transformer on loader value', async () => {
         mockCache.get.mockImplementation((key, loader) => loader(key));
 
         const inputTransformer = jest.fn().mockReturnValueOnce('transformedInput');
-        const outputTransformer = jest.fn().mockReturnValueOnce('transformedOutput');
+        const outputTransformer = jest.fn().mockReturnValue('transformedOutput');
 
         const loader = jest.fn().mockResolvedValue('loaderValue');
 
@@ -91,7 +254,9 @@ describe('A cache adapter that can transform keys and values', () => {
         const result = await cache.get('key', loader);
 
         expect(inputTransformer).toHaveBeenCalledWith('loaderValue');
-        expect(outputTransformer).toHaveBeenCalledWith('transformedInput');
+        expect(outputTransformer).toHaveBeenCalledTimes(2);
+        expect(outputTransformer).toHaveBeenNthCalledWith(1, 'transformedInput');
+        expect(outputTransformer).toHaveBeenNthCalledWith(2, 'transformedInput');
         expect(loader).toHaveBeenCalledWith('key');
         expect(result).toBe('transformedOutput');
     });
