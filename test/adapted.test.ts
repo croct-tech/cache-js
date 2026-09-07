@@ -146,6 +146,44 @@ describe('A cache adapter that can transform keys and values', () => {
         expect(outputTransformer).toHaveBeenCalledWith('malformed');
     });
 
+    it('should reuse a loaded value when output transformation fails after a cache miss', async () => {
+        mockCache.get.mockImplementation((key, cacheLoader) => cacheLoader(key));
+
+        const error = new Error('Failed to transform loaded value');
+        const outputTransformer = jest.fn(() => {
+            throw error;
+        });
+        const loader = jest.fn().mockResolvedValueOnce('fresh')
+        const cache = AdaptedCache.transformValues(mockCache, (value: string) => value, outputTransformer);
+
+        await expect(cache.get('key', loader)).rejects.toBe(error);
+
+        expect(loader).toHaveBeenCalledTimes(1);
+    });
+
+    it('should reuse rejected transformations only within the current invocation', async () => {
+        mockCache.get.mockImplementation(async (key, cacheLoader) => {
+            try {
+                return await cacheLoader(key);
+            } catch {
+                return 'malformed';
+            }
+        });
+
+        const error = new Error('Failed to transform loaded value');
+        const outputTransformer = jest.fn(() => {
+            throw error;
+        });
+        const loader = jest.fn().mockResolvedValue('fresh');
+        const cache = AdaptedCache.transformValues(mockCache, (value: string) => value, outputTransformer);
+
+        await expect(cache.get('key', loader)).rejects.toBe(error);
+        expect(loader).toHaveBeenCalledTimes(1);
+
+        await expect(cache.get('key', loader)).rejects.toBe(error);
+        expect(loader).toHaveBeenCalledTimes(2);
+    });
+
     it('should propagate shared freshly loaded deserialization errors without retrying', async () => {
         mockCache.get.mockReset();
         mockCache.delete.mockReset();
@@ -227,14 +265,13 @@ describe('A cache adapter that can transform keys and values', () => {
         expect(mockCache.get).toHaveBeenNthCalledWith(2, 'transformed-key', expect.any(Function));
         expect(mockCache.delete).toHaveBeenCalledTimes(1);
         expect(mockCache.delete).toHaveBeenCalledWith('transformed-key');
-        expect(loader).toHaveBeenCalledTimes(2);
+        expect(loader).toHaveBeenCalledTimes(1);
         expect(loader).toHaveBeenCalledWith('key');
-        expect(inputTransformer).toHaveBeenCalledTimes(2);
+        expect(inputTransformer).toHaveBeenCalledTimes(1);
         expect(inputTransformer).toHaveBeenCalledWith('fresh');
         expect(outputTransformer).toHaveBeenNthCalledWith(1, 'fresh');
         expect(outputTransformer).toHaveBeenNthCalledWith(2, 'malformed');
         expect(outputTransformer).toHaveBeenNthCalledWith(3, 'fresh');
-        expect(outputTransformer).toHaveBeenNthCalledWith(4, 'fresh');
     });
 
     it('should apply the value input transformer on loader value', async () => {
