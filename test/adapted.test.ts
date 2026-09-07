@@ -153,7 +153,7 @@ describe('A cache adapter that can transform keys and values', () => {
         const outputTransformer = jest.fn(() => {
             throw error;
         });
-        const loader = jest.fn().mockResolvedValueOnce('fresh')
+        const loader = jest.fn().mockResolvedValueOnce('fresh');
         const cache = AdaptedCache.transformValues(mockCache, (value: string) => value, outputTransformer);
 
         await expect(cache.get('key', loader)).rejects.toBe(error);
