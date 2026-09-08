@@ -84,7 +84,7 @@ export class AdaptedCache<K, V, IK = K, IV = V> implements CacheProvider<K, V> {
     public async get(key: K, loader: CacheLoader<K, V>): Promise<V> {
         const transformedKey = await this.keyTransformer(key);
 
-        let loadedValue: Promise<IV>;
+        let loadedValue: Promise<IV> | undefined;
 
         const transformedLoader: CacheLoader<IK, IV> = () => {
             if (loadedValue === undefined) {
