@@ -136,7 +136,12 @@ This library ships with a few `CacheProvider` implementations, including:
 
 - [`PrefixedCache`](src/prefixed.ts): A cache wrapper that prefixes all keys with a string.
 - [`AdaptedCache`](src/adapted.ts): A cache wrapper that adapts a typed `CacheProvider<K, V>` into a 
-`CacheProvider<IK, IV>` by transforming keys and values. Available transformers:
+`CacheProvider<IK, IV>` by transforming keys and values. If a cached value cannot be transformed,
+the adapter deletes it and retries once through the underlying cache. Loader reuse and recovery are
+scoped to each execution; the adapter does not coordinate separate calls. To share the entire read
+and recovery operation, wrap the adapter in a `SharedInFlightCache`. Freshly loaded values are
+validated before the underlying cache can store them; validation failures propagate without starting
+recovery. Available transformers:
      - `AdaptedCache.createHashSerializer`: Serializes any object into a hash. This is typically used to transform keys into strings.
      - `AdaptedCache.jsonSerializer`: Serializes any object to a JSON string. This is a typed wrapper around `JSON.stringify`.
      - `AdaptedCache.jsonDeserializer`: Deserializes a JSON string into a `JsonValue`. This is a typed wrapper around `JSON.parse`.
