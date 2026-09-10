@@ -7,6 +7,9 @@ on:
 
 jobs:
   deploy:
+    permissions:
+      contents: read
+      id-token: write
     uses: croct-tech/shared-public-configs/.github/workflows/publish-public-npm-package.yml@master
     with:
       prepare-script: >-
@@ -15,5 +18,3 @@ jobs:
         tmp=$(mktemp) &&
         jq --arg version "$GITHUB_REF_NAME" '.version = $version' package.json > "$tmp" &&
         mv "$tmp" package.json
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
